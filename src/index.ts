@@ -6,6 +6,12 @@
  */
 
 export { parseAirDML, exportToAirDML } from './parser';
+export {
+  getDataTypesForDatabase,
+  getMergedDataTypes,
+  DATABASE_TYPES,
+  type DatabaseType,
+} from './database-types';
 export type {
   Diagram,
   Table,

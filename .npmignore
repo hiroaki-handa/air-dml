@@ -1,0 +1,38 @@
+# Source files (dist only)
+src/
+tests/
+*.test.ts
+
+# TypeScript
+tsconfig.json
+*.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Development
+.vscode/
+.idea/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Documentation source
+docs/
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

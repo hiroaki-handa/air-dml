@@ -38,17 +38,21 @@ interface ParsedAttributes {
  * @returns Diagram object
  */
 export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
+  // Parse AIR-DML custom attributes from raw text BEFORE cleaning
+  const tableAttributes = parseTableAttributes(airDmlText);
+  const columnAttributes = parseColumnAttributes(airDmlText);
+  const referenceAttributes = parseReferenceAttributes(airDmlText);
+
+  // Remove extended attributes for standard DBML parser
+  const cleanedDbml = removeExtendedAttributes(airDmlText);
+
+  // Parse with standard DBML parser
   const parser = new Parser();
-  const database = parser.parse(airDmlText, 'dbml');
+  const database = parser.parse(cleanedDbml, 'dbml');
 
   // Extract project name and database type
   const project = database.name || 'Untitled Project';
   const databaseType = database.databaseType || 'PostgreSQL';
-
-  // Parse AIR-DML custom attributes from raw text
-  const tableAttributes = parseTableAttributes(airDmlText);
-  const columnAttributes = parseColumnAttributes(airDmlText);
-  const referenceAttributes = parseReferenceAttributes(airDmlText);
 
   // Parse tables
   const tables: Table[] = database.schemas.flatMap((schema) =>
@@ -332,6 +336,94 @@ export function exportToAirDML(diagram: Diagram): string {
 }
 
 // ===== Helper Functions =====
+
+/**
+ * Remove AIR-DML extended attributes from text before parsing with standard DBML parser
+ * Extended attributes will be extracted separately and merged back later
+ */
+function removeExtendedAttributes(airDmlText: string): string {
+  let cleaned = airDmlText;
+
+  // Remove extended attributes from Table definitions
+  cleaned = cleaned.replace(
+    /Table\s+(["`]?)(\w+)\1\s*\[([^\]]+)\]/g,
+    (_match, quote, tableName, attrs) => {
+      // Keep only standard DBML attributes (headercolor, note)
+      const standardAttrs = attrs.split(',')
+        .map((attr: string) => attr.trim())
+        .filter((attr: string) => {
+          const attrName = attr.split(':')[0].trim().toLowerCase();
+          return attrName === 'headercolor' || attrName.startsWith('note');
+        });
+
+      if (standardAttrs.length > 0) {
+        return `Table ${quote}${tableName}${quote} [${standardAttrs.join(', ')}]`;
+      } else {
+        return `Table ${quote}${tableName}${quote}`;
+      }
+    }
+  );
+
+  // Remove extended attributes from Column definitions
+  cleaned = cleaned.replace(
+    /(\s+)(["`]?)(\w+)\2\s+(\w+(?:\([^)]*\))?)\s*\[([^\]]+)\]/g,
+    (_match, indent, quote, colName, colType, attrs) => {
+      // Keep only standard DBML attributes
+      const standardAttrs = attrs.split(',')
+        .map((attr: string) => attr.trim())
+        .filter((attr: string) => {
+          const lower = attr.toLowerCase();
+          // Standard DBML column attributes
+          return (
+            lower === 'pk' ||
+            lower === 'unique' ||
+            lower === 'not null' ||
+            lower === 'increment' ||
+            lower.startsWith('default') ||
+            lower.startsWith('note') ||
+            lower.startsWith('ref')
+          );
+        });
+
+      if (standardAttrs.length > 0) {
+        return `${indent}${quote}${colName}${quote} ${colType} [${standardAttrs.join(', ')}]`;
+      } else {
+        return `${indent}${quote}${colName}${quote} ${colType}`;
+      }
+    }
+  );
+
+  // Remove extended attributes from Ref definitions
+  cleaned = cleaned.replace(
+    /Ref\s*:\s*([^[\n]+)\[([^\]]+)\]/g,
+    (_match, refDef, attrs) => {
+      const standardAttrs = attrs.split(',')
+        .map((attr: string) => attr.trim())
+        .filter((attr: string) => {
+          const lower = attr.toLowerCase();
+          return lower.startsWith('delete') || lower.startsWith('update') ||
+                 lower.startsWith('ondelete') || lower.startsWith('onupdate');
+        });
+
+      if (standardAttrs.length > 0) {
+        return `Ref: ${refDef}[${standardAttrs.join(', ')}]`;
+      } else {
+        return `Ref: ${refDef}`;
+      }
+    }
+  );
+
+  // Remove extended attributes from Area definitions
+  cleaned = cleaned.replace(
+    /Area\s+(["`]?)(\w+)\1\s*\[([^\]]+)\]/g,
+    (_match, quote, areaName) => {
+      // Area attributes are all extended, so remove them all
+      return `Area ${quote}${areaName}${quote}`;
+    }
+  );
+
+  return cleaned;
+}
 
 function parseTableAttributes(airDmlText: string): Map<string, ParsedAttributes> {
   const result = new Map<string, ParsedAttributes>();

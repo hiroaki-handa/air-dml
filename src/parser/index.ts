@@ -66,7 +66,7 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
           name: field.name,
           logicalName: colAttrs.alias,
           type: mapDbmlTypeToDataType(field.type.type_name),
-          typeParams: field.type.args?.join(', '),
+          typeParams: Array.isArray(field.type.args) ? field.type.args.join(', ') : undefined,
           pk: field.pk || false,
           fk: colAttrs.fk || false,
           unique: field.unique || false,

@@ -198,6 +198,20 @@ export interface Area {
 }
 
 /**
+ * Comment - AIR-DML extension for preserving code comments
+ */
+export interface Comment {
+  /** Comment text (without // prefix) */
+  text: string;
+
+  /** Comment position/context */
+  context?: 'tables' | 'references' | 'areas' | 'table' | 'area' | 'reference';
+
+  /** Target element ID (if associated with specific element) */
+  targetId?: string;
+}
+
+/**
  * Diagram definition
  */
 export interface Diagram {
@@ -221,6 +235,9 @@ export interface Diagram {
 
   /** Area list - AIR-DML extension */
   areas?: Area[];
+
+  /** Comments - AIR-DML extension for preserving code readability */
+  comments?: Comment[];
 
   /** Created timestamp */
   createdAt?: string;

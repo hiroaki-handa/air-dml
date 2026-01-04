@@ -1,6 +1,6 @@
 {
   "name": "air-dml",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "AI-Ready Data Modeling Language - Extended DBML parser for AI-driven development",
   "type": "module",
   "main": "dist/index.js",

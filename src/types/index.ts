@@ -75,6 +75,9 @@ export interface Column {
 
   /** Note or description */
   note?: string;
+
+  /** Leading comments (comments immediately before this element) - AIR-DML extension */
+  leadingComments?: string[];
 }
 
 /**
@@ -104,6 +107,9 @@ export interface Table {
 
   /** Note or description */
   note?: string;
+
+  /** Leading comments (comments immediately before this table) - AIR-DML extension */
+  leadingComments?: string[];
 }
 
 /**
@@ -155,6 +161,9 @@ export interface Reference {
 
   /** Note */
   note?: string;
+
+  /** Leading comments (comments immediately before this reference) - AIR-DML extension */
+  leadingComments?: string[];
 }
 
 /**
@@ -195,20 +204,9 @@ export interface Area {
 
   /** Note or description */
   note?: string;
-}
 
-/**
- * Comment - AIR-DML extension for preserving code comments
- */
-export interface Comment {
-  /** Comment text (without // prefix) */
-  text: string;
-
-  /** Comment position/context */
-  context?: 'tables' | 'references' | 'areas' | 'table' | 'area' | 'reference';
-
-  /** Target element ID (if associated with specific element) */
-  targetId?: string;
+  /** Leading comments (comments immediately before this area) - AIR-DML extension */
+  leadingComments?: string[];
 }
 
 /**
@@ -235,9 +233,6 @@ export interface Diagram {
 
   /** Area list - AIR-DML extension */
   areas?: Area[];
-
-  /** Comments - AIR-DML extension for preserving code readability */
-  comments?: Comment[];
 
   /** Created timestamp */
   createdAt?: string;

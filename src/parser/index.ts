@@ -11,7 +11,6 @@ import type {
   Column,
   Reference,
   Area,
-  Comment,
   DataType,
   RelationshipType,
 } from '../types';
@@ -41,6 +40,9 @@ interface ParsedAttributes {
  * @returns Diagram object
  */
 export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
+  // Parse comments from raw text FIRST
+  const commentMap = parseComments(airDmlText);
+
   // Parse AIR-DML custom attributes from raw text BEFORE cleaning
   const tableAttributes = parseTableAttributes(airDmlText);
   const columnAttributes = parseColumnAttributes(airDmlText);
@@ -91,6 +93,7 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
           : undefined,
         areaIds: [],
         note: dbmlTable.note,
+        leadingComments: commentMap.get(`table:${dbmlTable.name}`),
       };
     })
   );
@@ -114,6 +117,22 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
         }
       }
 
+      // Find matching comment by searching for ref definition
+      let refComments: string[] | undefined;
+      for (const [key, comments] of commentMap.entries()) {
+        if (key.startsWith('ref:')) {
+          const refDef = key.substring(4); // Remove 'ref:' prefix
+          // Check if this ref definition matches (handle >, <, - operators and optional attributes)
+          const normalizedRef = refDef.replace(/\s*\[[^\]]*\]\s*$/, '').trim();
+          const refPattern1 = `${ref.endpoints[0].tableName}.${ref.endpoints[0].fieldNames[0]}`;
+          const refPattern2 = `${ref.endpoints[1].tableName}.${ref.endpoints[1].fieldNames[0]}`;
+          if (normalizedRef.includes(refPattern1) && normalizedRef.includes(refPattern2)) {
+            refComments = comments;
+            break;
+          }
+        }
+      }
+
       return {
         id: refId,
         fromTable: fromTableId,
@@ -122,6 +141,7 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
         toColumn: ref.endpoints[1].fieldNames[0],
         type: mapDbmlRelationType(ref.name),
         swapEdge: refAttrs.swap_edge,
+        leadingComments: refComments,
       };
     })
   );
@@ -181,12 +201,10 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
         databaseType,
         note,
         commonColumns,
+        leadingComments: commentMap.get(`area:${group.name}`),
       };
     })
   );
-
-  // Extract comments for code readability
-  const comments = parseComments(airDmlText, tables, areas);
 
   return {
     id: diagramId || `diagram-${Date.now()}`,
@@ -196,7 +214,6 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
     tables,
     references,
     areas,
-    comments,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -210,20 +227,10 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
 export function exportToAirDML(diagram: Diagram): string {
   let airDml = '';
 
-  // Helper function to get and format comments
-  const getComments = (context?: Comment['context'], targetId?: string): string => {
-    if (!diagram.comments || diagram.comments.length === 0) return '';
-
-    const matchingComments = diagram.comments.filter(c => {
-      if (targetId) {
-        return c.context === context && c.targetId === targetId;
-      }
-      return c.context === context;
-    });
-
-    if (matchingComments.length === 0) return '';
-
-    return matchingComments.map(c => `// ${c.text}\n`).join('');
+  // Helper function to format leading comments
+  const formatComments = (comments?: string[]): string => {
+    if (!comments || comments.length === 0) return '';
+    return comments.map(c => `// ${c}\n`).join('');
   };
 
   // Project header
@@ -234,13 +241,10 @@ export function exportToAirDML(diagram: Diagram): string {
   airDml += `  Note: "Generated with AIR-DML"\n`;
   airDml += `}\n\n`;
 
-  // Tables section comment
-  airDml += getComments('tables');
-
   // Tables
   diagram.tables.forEach((table) => {
-    // Table-specific comment
-    airDml += getComments('table', table.id);
+    // Output leading comments for this table
+    airDml += formatComments(table.leadingComments);
     const tableAttrs: string[] = [];
 
     if (table.logicalName) {
@@ -293,13 +297,10 @@ export function exportToAirDML(diagram: Diagram): string {
     airDml += `}\n\n`;
   });
 
-  // References section comment
-  airDml += getComments('references');
-
   // References
   diagram.references.forEach((ref) => {
-    // Reference-specific comment (if any)
-    airDml += getComments('reference');
+    // Output leading comments for this reference
+    airDml += formatComments(ref.leadingComments);
 
     const fromTable = diagram.tables.find((t) => t.id === ref.fromTable);
     const toTable = diagram.tables.find((t) => t.id === ref.toTable);
@@ -319,14 +320,11 @@ export function exportToAirDML(diagram: Diagram): string {
 
   airDml += '\n';
 
-  // Areas section comment
-  airDml += getComments('areas');
-
   // Areas (AIR-DML extension)
   if (diagram.areas && diagram.areas.length > 0) {
     diagram.areas.forEach((area) => {
-      // Area-specific comment
-      airDml += getComments('area', area.id);
+      // Output leading comments for this area
+      airDml += formatComments(area.leadingComments);
 
       const tablesInArea = diagram.tables.filter(t => t.areaIds?.includes(area.id));
       const tableNames = tablesInArea
@@ -667,81 +665,59 @@ function parseReferenceAttributes(airDmlText: string): Map<string, ParsedAttribu
 }
 
 /**
- * Extract comments from AIR-DML text
- * Preserves comments for code readability
+ * Extract comments from AIR-DML text and associate with their following elements
+ * Returns a map of element identifiers to their preceding comment lines
+ * @param airDmlText - The AIR-DML source text
+ * @returns Map of element identifier to array of comment strings
  */
-function parseComments(airDmlText: string, tables: Table[], areas?: Area[]): Comment[] {
-  const comments: Comment[] = [];
+function parseComments(airDmlText: string): Map<string, string[]> {
+  const commentMap = new Map<string, string[]>();
   const lines = airDmlText.split('\n');
+  let accumulatedComments: string[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Match single-line comments // ...
+    // Check if this is a comment line
     const commentMatch = line.match(/^\/\/\s*(.*)$/);
-    if (!commentMatch) continue;
-
-    const commentText = commentMatch[1].trim();
-    if (!commentText) continue; // Skip empty comments
-
-    // Determine context by looking at next non-empty, non-comment line
-    let context: Comment['context'] = undefined;
-    let targetId: string | undefined = undefined;
-
-    for (let j = i + 1; j < lines.length; j++) {
-      const nextLine = lines[j].trim();
-      if (!nextLine || nextLine.startsWith('//')) continue;
-
-      // Check if next line is a table definition
-      if (nextLine.match(/^Table\s+/)) {
-        context = 'table';
-        const tableNameMatch = nextLine.match(/^Table\s+(["`]?)(.+?)\1/);
-        if (tableNameMatch) {
-          const tableName = tableNameMatch[2];
-          const table = tables.find(t => t.name === tableName);
-          if (table) targetId = table.id;
-        }
-      }
-      // Check if next line is an area definition
-      else if (nextLine.match(/^Area\s+/)) {
-        context = 'area';
-        const areaNameMatch = nextLine.match(/^Area\s+(["`]?)(.+?)\1/);
-        if (areaNameMatch && areas) {
-          const areaName = areaNameMatch[2];
-          const area = areas.find(a => a.name === areaName);
-          if (area) targetId = area.id;
-        }
-      }
-      // Check if next line is a reference definition
-      else if (nextLine.match(/^Ref\s*:/)) {
-        context = 'reference';
-      }
-
-      break; // Stop after first non-empty line
+    if (commentMatch) {
+      accumulatedComments.push(commentMatch[1]);
+      continue;
     }
 
-    // If no specific context, check for section headers
-    if (!context) {
-      const lowerText = commentText.toLowerCase();
-      if (lowerText.includes('table') || lowerText.includes('テーブル')) {
-        context = 'tables';
-      } else if (lowerText.includes('reference') || lowerText.includes('relation') ||
-                 lowerText.includes('リレーション') || lowerText.includes('参照')) {
-        context = 'references';
-      } else if (lowerText.includes('area') || lowerText.includes('エリア') ||
-                 lowerText.includes('group') || lowerText.includes('グループ')) {
-        context = 'areas';
-      }
-    }
+    // If we have accumulated comments and this is a non-empty line, identify the element
+    if (accumulatedComments.length > 0 && line.length > 0) {
+      let elementKey: string | null = null;
 
-    comments.push({
-      text: commentText,
-      context,
-      targetId,
-    });
+      // Match Table definition
+      const tableMatch = line.match(/^Table\s+(["`]?)(.+?)\1/);
+      if (tableMatch) {
+        elementKey = `table:${tableMatch[2]}`;
+      }
+
+      // Match Area definition
+      const areaMatch = line.match(/^Area\s+(["`]?)(.+?)\1/);
+      if (areaMatch) {
+        elementKey = `area:${areaMatch[2]}`;
+      }
+
+      // Match Reference definition
+      const refMatch = line.match(/^Ref\s*:\s*(.+)/);
+      if (refMatch) {
+        // Parse the reference definition to create a unique key
+        const refDef = refMatch[1].trim();
+        elementKey = `ref:${refDef}`;
+      }
+
+      if (elementKey) {
+        commentMap.set(elementKey, [...accumulatedComments]);
+      }
+
+      accumulatedComments = [];
+    }
   }
 
-  return comments;
+  return commentMap;
 }
 
 function parseAttributesString(attrsStr: string): ParsedAttributes {

@@ -119,7 +119,8 @@ export type RelationshipType =
   | 'one-to-many' // 1:n
   | 'many-to-one' // n:1
   | 'many-to-many' // n:n
-  | 'any'; // AI inference (undetermined) - AIR-DML extension
+  | 'any' // AI inference (undetermined) - AIR-DML extension
+  | 'ai-inferred'; // AI inference (alias for 'any')
 
 /**
  * Reference (foreign key relationship)

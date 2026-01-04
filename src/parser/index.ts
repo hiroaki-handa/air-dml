@@ -624,7 +624,7 @@ function mapDbmlRelationType(relType: string): RelationshipType {
   if (relType === '>') return 'one-to-many';
   if (relType === '-') return 'one-to-one';
   if (relType === '<>' || relType === '><') return 'many-to-many';
-  if (relType === '~') return 'any';
+  if (relType === '~') return 'ai-inferred';
   return 'many-to-one';
 }
 
@@ -634,6 +634,7 @@ function getRelationshipSymbol(relType?: RelationshipType): string {
   if (relType === 'one-to-one') return '-';
   if (relType === 'many-to-many') return '><';
   if (relType === 'any') return '~';
+  if (relType === 'ai-inferred') return '~';
   return '<';
 }
 

@@ -26,6 +26,8 @@ interface ParsedAttributes {
   height?: number;
   color?: string;
   database_type?: string;
+  label_horizontal?: string;
+  label_vertical?: string;
   note?: string;
   swap_edge?: boolean;
   fk?: boolean;
@@ -144,6 +146,12 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
       // Parse CommonColumns from raw text
       const commonColumns = parseAreaCommonColumns(airDmlText, group.name);
 
+      // Parse Note from raw text (not from parameters)
+      const note = parseAreaNote(airDmlText, group.name);
+
+      // Parse database_type from raw text (inside curly braces, like Project)
+      const databaseType = parseAreaDatabaseType(airDmlText, group.name);
+
       return {
         id: areaId,
         name: group.name,
@@ -153,8 +161,10 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
           : undefined,
         width: areaAttrs.width,
         height: areaAttrs.height,
-        databaseType: areaAttrs.database_type,
-        note: areaAttrs.note,
+        labelHorizontal: areaAttrs.label_horizontal as 'left' | 'center' | 'right' | undefined,
+        labelVertical: areaAttrs.label_vertical as 'top' | 'center' | 'bottom' | undefined,
+        databaseType,
+        note,
         commonColumns,
       };
     })
@@ -286,12 +296,13 @@ export function exportToAirDML(diagram: Diagram): string {
         if (area.color) {
           areaAttrs.push(`color: "${area.color}"`);
         }
-        if (area.databaseType) {
-          areaAttrs.push(`database_type: "${area.databaseType}"`);
+        if (area.labelHorizontal) {
+          areaAttrs.push(`label_horizontal: "${area.labelHorizontal}"`);
         }
-        if (area.note) {
-          areaAttrs.push(`note: "${area.note.replace(/"/g, '\\"')}"`);
+        if (area.labelVertical) {
+          areaAttrs.push(`label_vertical: "${area.labelVertical}"`);
         }
+        // database_type, note, commonColumnsはすべて中かっこ内に記載（Projectと同様）
 
         const attrStr = areaAttrs.length > 0 ? ` [${areaAttrs.join(', ')}]` : '';
         airDml += `Area ${escapeIdentifier(area.name)}${attrStr} {\n`;
@@ -299,6 +310,11 @@ export function exportToAirDML(diagram: Diagram): string {
         tableNames.forEach((name) => {
           airDml += `  ${name}\n`;
         });
+
+        // Export database_type (inside curly braces, like Project)
+        if (area.databaseType) {
+          airDml += `\n  database_type: "${area.databaseType}"\n`;
+        }
 
         // Export CommonColumns
         if (area.commonColumns && area.commonColumns.length > 0) {
@@ -325,6 +341,11 @@ export function exportToAirDML(diagram: Diagram): string {
             airDml += `    ${escapeIdentifier(column.name)} ${typeStr}${constraintStr}\n`;
           });
           airDml += `  ]\n`;
+        }
+
+        // Export Note (after CommonColumns, similar to Table/Project style)
+        if (area.note) {
+          airDml += `\n  Note: "${area.note.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"\n`;
         }
 
         airDml += `}\n\n`;
@@ -534,6 +555,32 @@ function parseAreaCommonColumns(airDmlText: string, areaName: string): Column[] 
   return columns.length > 0 ? columns : undefined;
 }
 
+function parseAreaNote(airDmlText: string, areaName: string): string | undefined {
+  const areaBlockRegex = new RegExp(`Area\\s+(["\`]?)${areaName}\\1\\s*(?:\\[[^\\]]*\\])?\\s*\\{([^}]*)\\}`, 's');
+  const areaMatch = areaBlockRegex.exec(airDmlText);
+
+  if (!areaMatch) return undefined;
+
+  const areaContent = areaMatch[2];
+  const noteRegex = /Note:?\s*"([^"]*)"/;
+  const noteMatch = noteRegex.exec(areaContent);
+
+  return noteMatch ? noteMatch[1] : undefined;
+}
+
+function parseAreaDatabaseType(airDmlText: string, areaName: string): string | undefined {
+  const areaBlockRegex = new RegExp(`Area\\s+(["\`]?)${areaName}\\1\\s*(?:\\[[^\\]]*\\])?\\s*\\{([^}]*)\\}`, 's');
+  const areaMatch = areaBlockRegex.exec(airDmlText);
+
+  if (!areaMatch) return undefined;
+
+  const areaContent = areaMatch[2];
+  const databaseTypeRegex = /database_type:?\s*["']([^"']*)["']/;
+  const databaseTypeMatch = databaseTypeRegex.exec(areaContent);
+
+  return databaseTypeMatch ? databaseTypeMatch[1] : undefined;
+}
+
 function parseReferenceAttributes(airDmlText: string): Map<string, ParsedAttributes> {
   const result = new Map<string, ParsedAttributes>();
   const refRegex = /Ref\s*:\s*(["`]?)(\w+)\1\.(["`]?)(\w+)\3\s*[<>\-~]+\s*(["`]?)(\w+)\5\.(["`]?)(\w+)\7\s*\[([^\]]+)\]/g;
@@ -578,8 +625,13 @@ function parseAttributesString(attrsStr: string): ParsedAttributes {
   const databaseTypeMatch = attrsStr.match(/database_type\s*:\s*"([^"]*)"/);
   if (databaseTypeMatch) attrs.database_type = databaseTypeMatch[1];
 
-  const noteMatch = attrsStr.match(/note\s*:\s*"([^"]*)"/);
-  if (noteMatch) attrs.note = noteMatch[1];
+  const labelHorizontalMatch = attrsStr.match(/label_horizontal\s*:\s*"([^"]*)"/);
+  if (labelHorizontalMatch) attrs.label_horizontal = labelHorizontalMatch[1];
+
+  const labelVerticalMatch = attrsStr.match(/label_vertical\s*:\s*"([^"]*)"/);
+  if (labelVerticalMatch) attrs.label_vertical = labelVerticalMatch[1];
+
+  // Note: noteはパラメータから読み取らない（ブロック内のNote:から読み取る）
 
   const swapEdgeMatch = attrsStr.match(/swap_edge\s*:\s*(true|false)/);
   if (swapEdgeMatch) attrs.swap_edge = swapEdgeMatch[1] === 'true';

@@ -711,9 +711,8 @@ function parseComments(airDmlText: string): Map<string, string[]> {
 
       if (elementKey) {
         commentMap.set(elementKey, [...accumulatedComments]);
+        accumulatedComments = [];
       }
-
-      accumulatedComments = [];
     }
   }
 

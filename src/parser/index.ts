@@ -690,15 +690,15 @@ function parseComments(airDmlText: string): Map<string, string[]> {
       let elementKey: string | null = null;
 
       // Match Table definition
-      const tableMatch = line.match(/^Table\s+(["`]?)(.+?)\1/);
+      const tableMatch = line.match(/^Table\s+(\w+)/);
       if (tableMatch) {
-        elementKey = `table:${tableMatch[2]}`;
+        elementKey = `table:${tableMatch[1]}`;
       }
 
       // Match Area definition
-      const areaMatch = line.match(/^Area\s+(["`]?)(.+?)\1/);
+      const areaMatch = line.match(/^Area\s+"([^"]+)"/);
       if (areaMatch) {
-        elementKey = `area:${areaMatch[2]}`;
+        elementKey = `area:${areaMatch[1]}`;
       }
 
       // Match Reference definition

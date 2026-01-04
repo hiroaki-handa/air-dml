@@ -152,9 +152,23 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
       // Parse database_type from raw text (inside curly braces, like Project)
       const databaseType = parseAreaDatabaseType(airDmlText, group.name);
 
+      // Extract table names from TableGroup
+      const tableNames = (group.tables || []).map((tableRef: any) =>
+        typeof tableRef === 'string' ? tableRef : tableRef.name
+      );
+
+      // Map table names to table IDs
+      const tableIds = tableNames
+        .map((tableName: string) => {
+          const table = tables.find(t => t.name === tableName);
+          return table?.id;
+        })
+        .filter(Boolean) as string[];
+
       return {
         id: areaId,
         name: group.name,
+        tables: tableIds,
         color: areaAttrs.color,
         pos: areaAttrs.pos_x !== undefined && areaAttrs.pos_y !== undefined
           ? { x: areaAttrs.pos_x, y: areaAttrs.pos_y }
@@ -434,12 +448,22 @@ function removeExtendedAttributes(airDmlText: string): string {
     }
   );
 
-  // Remove extended attributes from Area definitions
+  // Convert Area to TableGroup and remove extended attributes
+  // air-dml uses 'Area' keyword for user-facing syntax
+  // but standard DBML uses 'TableGroup'
   cleaned = cleaned.replace(
     /Area\s+(["`]?)(\w+)\1\s*\[([^\]]+)\]/g,
     (_match, quote, areaName) => {
-      // Area attributes are all extended, so remove them all
-      return `Area ${quote}${areaName}${quote}`;
+      // Convert Area → TableGroup and remove all extended attributes
+      return `TableGroup ${quote}${areaName}${quote}`;
+    }
+  );
+
+  // Also convert Area without attributes
+  cleaned = cleaned.replace(
+    /Area\s+(["`]?)(\w+)\1\s*\{/g,
+    (_match, quote, areaName) => {
+      return `TableGroup ${quote}${areaName}${quote} {`;
     }
   );
 

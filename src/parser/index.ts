@@ -448,15 +448,16 @@ function removeExtendedAttributes(airDmlText: string): string {
     }
   );
 
-  // Convert Area to TableGroup and preserve attributes
+  // Convert Area to TableGroup (without attributes - TableGroup doesn't support them)
   // air-dml uses 'Area' keyword for user-facing syntax
   // but standard DBML uses 'TableGroup'
   // Use .+? to match any characters (including Japanese) inside quotes
+  // Attributes are extracted separately by parseAreaAttributes() before this conversion
   cleaned = cleaned.replace(
     /Area\s+(["`]?)(.+?)\1\s*\[([^\]]+)\]/g,
-    (_match, quote, areaName, attrs) => {
-      // Convert Area → TableGroup and preserve all attributes
-      return `TableGroup ${quote}${areaName}${quote} [${attrs}]`;
+    (_match, quote, areaName) => {
+      // Convert Area → TableGroup WITHOUT attributes (standard DBML doesn't support them)
+      return `TableGroup ${quote}${areaName}${quote}`;
     }
   );
 
@@ -514,7 +515,8 @@ function parseColumnAttributes(airDmlText: string): Map<string, ParsedAttributes
 
 function parseAreaAttributes(airDmlText: string): Map<string, ParsedAttributes> {
   const result = new Map<string, ParsedAttributes>();
-  const areaRegex = /Area\s+(["`]?)(\w+)\1\s*\[([^\]]+)\]/g;
+  // Use .+? to match Japanese characters in Area names
+  const areaRegex = /Area\s+(["`]?)(.+?)\1\s*\[([^\]]+)\]/g;
 
   let match;
   while ((match = areaRegex.exec(airDmlText)) !== null) {

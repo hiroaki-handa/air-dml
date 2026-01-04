@@ -448,15 +448,15 @@ function removeExtendedAttributes(airDmlText: string): string {
     }
   );
 
-  // Convert Area to TableGroup and remove extended attributes
+  // Convert Area to TableGroup and preserve attributes
   // air-dml uses 'Area' keyword for user-facing syntax
   // but standard DBML uses 'TableGroup'
   // Use .+? to match any characters (including Japanese) inside quotes
   cleaned = cleaned.replace(
     /Area\s+(["`]?)(.+?)\1\s*\[([^\]]+)\]/g,
-    (_match, quote, areaName) => {
-      // Convert Area → TableGroup and remove all extended attributes
-      return `TableGroup ${quote}${areaName}${quote}`;
+    (_match, quote, areaName, attrs) => {
+      // Convert Area → TableGroup and preserve all attributes
+      return `TableGroup ${quote}${areaName}${quote} [${attrs}]`;
     }
   );
 

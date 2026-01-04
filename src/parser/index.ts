@@ -277,7 +277,7 @@ export function exportToAirDML(diagram: Diagram): string {
 
       const refAttrs: string[] = [];
       if (ref.swapEdge) {
-        refAttrs.push('swap_edge: true');
+        refAttrs.push('swapEdge: true');
       }
       const attrStr = refAttrs.length > 0 ? ` [${refAttrs.join(', ')}]` : '';
 
@@ -660,7 +660,8 @@ function parseAttributesString(attrsStr: string): ParsedAttributes {
 
   // Note: noteはパラメータから読み取らない（ブロック内のNote:から読み取る）
 
-  const swapEdgeMatch = attrsStr.match(/swap_edge\s*:\s*(true|false)/);
+  // Support both swapEdge (camelCase) and swap_edge (snake_case)
+  const swapEdgeMatch = attrsStr.match(/(?:swapEdge|swap_edge)\s*:\s*(true|false)/);
   if (swapEdgeMatch) attrs.swap_edge = swapEdgeMatch[1] === 'true';
 
   if (/\bfk\b/.test(attrsStr)) attrs.fk = true;

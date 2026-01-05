@@ -112,6 +112,7 @@ Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] 
 Ref: table_a.column > table_b.column   // Many-to-One (A → B)
 Ref: table_a.column < table_b.column   // One-to-Many (A ← B)
 Ref: table_a.column - table_b.column   // One-to-One
+Ref: table_a.column >< table_b.column  // Many-to-Many
 Ref: table_a.column ~ table_b.column   // AI-inferred (undetermined)
 ```
 

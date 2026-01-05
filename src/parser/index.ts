@@ -146,6 +146,11 @@ export function parseAirDML(airDmlText: string, diagramId?: string): Diagram {
     })
   );
 
+  // Parse AIR-DML specific ~ refs (ai-inferred relationships)
+  // These are not supported by @dbml/core, so we parse them separately
+  const aiInferredRefs = parseAiInferredRefs(airDmlText, commentMap);
+  references.push(...aiInferredRefs);
+
   // Parse areas (AIR-DML extension)
   const areaAttributes = parseAreaAttributes(airDmlText);
   const areas: Area[] = database.schemas.flatMap((schema) =>
@@ -409,6 +414,45 @@ export function exportToAirDML(diagram: Diagram): string {
 // ===== Helper Functions =====
 
 /**
+ * Split attributes string by comma, respecting quoted values
+ * e.g., 'not null, alias: "foo, bar", note: "test"' -> ['not null', 'alias: "foo, bar"', 'note: "test"']
+ */
+function splitAttributes(attrsStr: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  let quoteChar = '';
+
+  for (let i = 0; i < attrsStr.length; i++) {
+    const char = attrsStr[i];
+
+    if ((char === '"' || char === "'") && (i === 0 || attrsStr[i - 1] !== '\\')) {
+      if (!inQuotes) {
+        inQuotes = true;
+        quoteChar = char;
+      } else if (char === quoteChar) {
+        inQuotes = false;
+        quoteChar = '';
+      }
+      current += char;
+    } else if (char === ',' && !inQuotes) {
+      if (current.trim()) {
+        result.push(current.trim());
+      }
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.trim()) {
+    result.push(current.trim());
+  }
+
+  return result;
+}
+
+/**
  * Remove AIR-DML extended attributes from text before parsing with standard DBML parser
  * Extended attributes will be extracted separately and merged back later
  */
@@ -420,8 +464,7 @@ function removeExtendedAttributes(airDmlText: string): string {
     /Table\s+(["`]?)(\w+)\1\s*\[([^\]]+)\]/g,
     (_match, quote, tableName, attrs) => {
       // Keep only standard DBML attributes (headercolor, note)
-      const standardAttrs = attrs.split(',')
-        .map((attr: string) => attr.trim())
+      const standardAttrs = splitAttributes(attrs)
         .filter((attr: string) => {
           const attrName = attr.split(':')[0].trim().toLowerCase();
           return attrName === 'headercolor' || attrName.startsWith('note');
@@ -440,8 +483,7 @@ function removeExtendedAttributes(airDmlText: string): string {
     /(\s+)(["`]?)(\w+)\2\s+(\w+(?:\([^)]*\))?)\s*\[([^\]]+)\]/g,
     (_match, indent, quote, colName, colType, attrs) => {
       // Keep only standard DBML attributes
-      const standardAttrs = attrs.split(',')
-        .map((attr: string) => attr.trim())
+      const standardAttrs = splitAttributes(attrs)
         .filter((attr: string) => {
           const lower = attr.toLowerCase();
           // Standard DBML column attributes
@@ -468,8 +510,7 @@ function removeExtendedAttributes(airDmlText: string): string {
   cleaned = cleaned.replace(
     /Ref\s*:\s*([^[\n]+)\[([^\]]+)\]/g,
     (_match, refDef, attrs) => {
-      const standardAttrs = attrs.split(',')
-        .map((attr: string) => attr.trim())
+      const standardAttrs = splitAttributes(attrs)
         .filter((attr: string) => {
           const lower = attr.toLowerCase();
           return lower.startsWith('delete') || lower.startsWith('update') ||
@@ -482,6 +523,13 @@ function removeExtendedAttributes(airDmlText: string): string {
         return `Ref: ${refDef}`;
       }
     }
+  );
+
+  // Remove AIR-DML specific ~ operator refs (they will be parsed separately)
+  // @dbml/core doesn't support ~ operator
+  cleaned = cleaned.replace(
+    /Ref\s*:\s*[^\n]*~[^\n]*/g,
+    ''
   );
 
   // Convert Area to TableGroup (without attributes - TableGroup doesn't support them)
@@ -662,6 +710,55 @@ function parseReferenceAttributes(airDmlText: string): Map<string, ParsedAttribu
   }
 
   return result;
+}
+
+/**
+ * Parse AIR-DML specific ~ (ai-inferred) references
+ * These are not supported by @dbml/core, so we parse them separately
+ */
+function parseAiInferredRefs(airDmlText: string, commentMap: Map<string, string[]>): Reference[] {
+  const refs: Reference[] = [];
+  // Match: Ref: table1.col1 ~ table2.col2 [optional attributes]
+  const refRegex = /Ref\s*:\s*(["`]?)(\w+)\1\.(["`]?)(\w+)\3\s*~\s*(["`]?)(\w+)\5\.(["`]?)(\w+)\7(?:\s*\[([^\]]+)\])?/g;
+
+  let match;
+  while ((match = refRegex.exec(airDmlText)) !== null) {
+    const fromTable = match[2];
+    const fromColumn = match[4];
+    const toTable = match[6];
+    const toColumn = match[8];
+    const attrsStr = match[9] || '';
+    const attrs = parseAttributesString(attrsStr);
+
+    const refId = `ref-${fromTable}-${fromColumn}-${toTable}-${toColumn}`;
+
+    // Find matching comment
+    let refComments: string[] | undefined;
+    for (const [key, comments] of commentMap.entries()) {
+      if (key.startsWith('ref:')) {
+        const refDef = key.substring(4);
+        if (refDef.includes(fromTable) && refDef.includes(fromColumn) &&
+            refDef.includes(toTable) && refDef.includes(toColumn) &&
+            refDef.includes('~')) {
+          refComments = comments;
+          break;
+        }
+      }
+    }
+
+    refs.push({
+      id: refId,
+      fromTable: `table-${fromTable}`,
+      fromColumn: fromColumn,
+      toTable: `table-${toTable}`,
+      toColumn: toColumn,
+      type: 'ai-inferred',
+      swapEdge: attrs.swap_edge,
+      leadingComments: refComments,
+    });
+  }
+
+  return refs;
 }
 
 /**

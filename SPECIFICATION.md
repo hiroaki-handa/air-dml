@@ -409,29 +409,117 @@ Area "コンテンツ管理" [
 
 ## 5. AI生成時のガイドライン
 
-AIがAIR-DMLを生成する際は、以下のルールに従ってください：
+AIがAIR-DMLを生成する際は、以下のルールに従ってください。
 
-### 5.1 必須要素
-1. `Project`宣言を含める
-2. 各テーブルに`alias`（論理名）を設定
-3. 主キーには`[pk]`、外部キーには`[fk]`を明示
-4. リレーションは`Ref`構文で明示的に定義
+### 5.1 クイックリファレンス（AIプロンプト用）
 
-### 5.2 推奨要素
+以下はAIがAIR-DMLを生成する際の最小限の構文リファレンスです：
+
+```dbml
+// ========================================
+// テーブル定義
+// ========================================
+Table テーブル名 [alias: "日本語名"] {
+  カラム名 データ型 [制約, alias: "日本語名"]
+}
+
+// ========================================
+// 制約一覧
+// ========================================
+[pk]                    // 主キー
+[fk]                    // 外部キー（Refと併用）
+[unique]                // 一意制約
+[not null]              // NOT NULL
+[increment]             // 自動採番（serialと併用不要）
+[default: 値]           // デフォルト値
+[alias: "日本語名"]     // 論理名
+[note: "説明"]          // カラム説明
+
+// ========================================
+// データ型（PostgreSQL）
+// ========================================
+serial                  // 自動採番整数（PKに使用）
+integer, bigint         // 整数
+varchar(n), text        // 文字列
+boolean                 // 真偽値
+date, timestamp         // 日時
+json, jsonb             // JSON
+uuid                    // UUID
+
+// ========================================
+// リレーション定義
+// ========================================
+Ref: テーブルA.カラム > テーブルB.カラム   // 多対1（A→B）
+Ref: テーブルA.カラム < テーブルB.カラム   // 1対多（A←B）
+Ref: テーブルA.カラム - テーブルB.カラム   // 1対1
+
+// 例: posts.user_id > users.id
+//     ↑ 多くのpostsが1つのuserを参照
+
+// ========================================
+// Area定義（オプション）
+// ========================================
+Area "エリア名" [color: "#1976D2"] {
+  テーブル1
+  テーブル2
+}
+```
+
+### 5.2 完全な出力例
+
+```dbml
+// 定期購入機能
+Table subscriptions [alias: "定期購入"] {
+  id serial [pk, alias: "定期購入ID"]
+  user_id integer [fk, not null, alias: "ユーザーID"]
+  product_id integer [fk, not null, alias: "商品ID"]
+  delivery_frequency text [not null, alias: "配送頻度"]
+  status text [not null, default: 'active', alias: "ステータス"]
+  next_delivery_date date [not null, alias: "次回配送予定日"]
+  start_date date [not null, alias: "開始日"]
+  end_date date [alias: "終了日"]
+  created_at timestamp [not null, alias: "作成日時"]
+  updated_at timestamp [not null, alias: "更新日時"]
+}
+
+Table subscription_deliveries [alias: "定期購入配送履歴"] {
+  id serial [pk, alias: "配送履歴ID"]
+  subscription_id integer [fk, not null, alias: "定期購入ID"]
+  scheduled_date date [not null, alias: "配送予定日"]
+  actual_date date [alias: "実際の配送日"]
+  status text [not null, default: 'pending', alias: "配送ステータス"]
+  created_at timestamp [not null, alias: "作成日時"]
+  updated_at timestamp [not null, alias: "更新日時"]
+}
+
+Ref: subscriptions.user_id > users.id
+Ref: subscriptions.product_id > products.id
+Ref: subscription_deliveries.subscription_id > subscriptions.id
+```
+
+### 5.3 重要な注意事項
+
+**必ず守ること：**
+- alias の値は**ダブルクォート**で囲む: `alias: "論理名"` ✅
+- シングルクォートは使用しない: `alias: '論理名'` ❌
+- 外部キーカラムには `[fk]` を付ける
+- リレーションは `Ref:` で別途定義する
+- カラム定義行にインラインコメント（`//`）を入れない
+
+**座標・色（オプション）：**
+- テーブル: `[alias: "名前", pos_x: 100, pos_y: 200, color: "#1976D2"]`
+- Area: `[pos_x: 50, pos_y: 50, width: 600, height: 300, color: "#1976D2"]`
+
+### 5.4 必須要素
+1. 各テーブルに`alias`（論理名）を設定
+2. 主キーには`[pk]`、外部キーには`[fk]`を明示
+3. リレーションは`Ref`構文で明示的に定義
+
+### 5.5 推奨要素
 1. カラムに`alias`（論理名）を設定
 2. テーブルに`pos_x`, `pos_y`を設定（自動レイアウトされない場合）
 3. 論理的なグループがある場合は`Area`を定義
 4. 共通カラム（created_at, updated_atなど）は`CommonColumns`で定義
-
-### 5.3 色指定
-- Area色: `#1976D2`（青）、`#9333EA`（紫）、`#10B981`（緑）など
-- テーブル色: エリアと同系色を推奨
-- **HEX形式**（6桁）を使用（例: `#1976D2`）
-
-### 5.4 座標指定
-- テーブル: 100単位で配置（100, 200, 300...）
-- Area: テーブルを包含するように40px程度の余白を持たせる
-- 重なりを避けるため、適切な間隔を保つ
 
 ---
 

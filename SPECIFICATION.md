@@ -556,7 +556,9 @@ Ref: subscription_deliveries.subscription_id > subscriptions.id
 
 ### 8.1 商標について
 
-**AIR-DML™** (AI-Ready Data Modeling Language) は、データミネーションパートナーズの商標です。
+**AIR-DML™** (AI-Ready Data Modeling Language) は、株式会社データミネーションパートナーズの商標です（商標出願中：商願2026-000274）。
+
+*AIR-DML™ — The Open Standard for AI-Ready Data Modeling.*
 
 本規格は、**AI（大規模言語モデル）によるデータの解釈・生成・変換を最大化する**ために設計された、次世代のデータモデリング言語です。
 

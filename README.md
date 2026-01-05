@@ -15,6 +15,7 @@ AIR-DML is an extended DBML (Database Markup Language) parser designed for AI-dr
 🎨 **Visual Design**: Coordinate and color information for diagram rendering
 🔄 **Polyglot Persistence**: Different database types per area
 📦 **Extends DBML**: Fully compatible with standard DBML, powered by `@dbml/core`
+💬 **Comment Preservation**: Leading comments are preserved and associated with elements
 
 ## Installation
 
@@ -33,6 +34,7 @@ Project "My Project" {
   database_type: 'PostgreSQL'
 }
 
+// ユーザー管理
 Table users [alias: "ユーザー", pos_x: 100, pos_y: 100, color: "#1976D2"] {
   id serial [pk, alias: "ユーザーID"]
   username varchar(100) [not null, unique, alias: "ユーザー名"]
@@ -40,20 +42,34 @@ Table users [alias: "ユーザー", pos_x: 100, pos_y: 100, color: "#1976D2"] {
   created_at timestamp [not null, alias: "作成日時"]
 }
 
+// プロフィール情報
+Table profiles [alias: "プロフィール", pos_x: 500, pos_y: 100] {
+  id serial [pk, alias: "プロフィールID"]
+  user_id integer [fk, not null, unique, alias: "ユーザーID"]
+  full_name varchar(200) [alias: "氏名"]
+  bio text [alias: "自己紹介"]
+}
+
+Ref: profiles.user_id - users.id
+
 Area "User Management" [
   pos_x: 50,
   pos_y: 50,
   width: 600,
   height: 300,
-  color: "#1976D2",
-  database_type: "PostgreSQL"
+  color: "#1976D2"
 ] {
   users
+  profiles
+
+  database_type: "PostgreSQL"
 
   CommonColumns: [
     created_at timestamp [not null, alias: "作成日時"]
     updated_at timestamp [not null, alias: "更新日時"]
   ]
+
+  Note: "ユーザー管理領域"
 }
 `;
 
@@ -65,93 +81,92 @@ const output = exportToAirDML(diagram);
 console.log(output);
 ```
 
-## AIR-DML Extensions
+## AIR-DML Syntax
 
-AIR-DML extends standard DBML with the following features:
-
-### 1. **Logical Names (Alias)**
-
-Add human-readable names in any language:
+### Table Definition
 
 ```dbml
-Table users [alias: "ユーザー"] {
-  id serial [pk, alias: "ユーザーID"]
-  name varchar(100) [alias: "名前"]
+Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] {
+  column_name data_type [constraints, alias: "カラム論理名"]
+
+  Note: "テーブルの説明"
 }
 ```
 
-### 2. **Visual Coordinates**
+### Column Constraints
 
-Position tables on a canvas:
+| Constraint | Description | Example |
+|------------|-------------|---------|
+| `pk` | Primary Key | `id serial [pk]` |
+| `fk` | Foreign Key (use with Ref) | `user_id integer [fk]` |
+| `unique` | Unique constraint | `email varchar [unique]` |
+| `not null` | NOT NULL constraint | `name varchar [not null]` |
+| `increment` | Auto increment | `id integer [pk, increment]` |
+| `default: value` | Default value | `status text [default: 'active']` |
+| `alias: "name"` | Logical name | `[alias: "ユーザーID"]` |
+| `note: "desc"` | Column description | `[note: "説明"]` |
+
+### Relationships
 
 ```dbml
-Table users [pos_x: 100, pos_y: 200, color: "#1976D2"] {
-  // ...
-}
+Ref: table_a.column > table_b.column   // Many-to-One (A → B)
+Ref: table_a.column < table_b.column   // One-to-Many (A ← B)
+Ref: table_a.column - table_b.column   // One-to-One
+Ref: table_a.column ~ table_b.column   // AI-inferred (undetermined)
 ```
 
-### 3. **Area (Bounded Context)**
-
-Group related tables into logical domains:
+### Area (Bounded Context)
 
 ```dbml
-Area "User Management" [
+Area "Area Name" [
   pos_x: 50,
   pos_y: 50,
   width: 600,
   height: 300,
-  color: "#1976D2",
-  database_type: "PostgreSQL",
-  note: "User authentication and profile management"
+  color: "#1976D2"
 ] {
-  users
-  profiles
+  table1
+  table2
+
+  database_type: "PostgreSQL"
 
   CommonColumns: [
-    created_at timestamp [not null]
-    updated_at timestamp [not null]
+    created_at timestamp [not null, alias: "作成日時"]
+    updated_at timestamp [not null, alias: "更新日時"]
   ]
+
+  Note: "Area description"
 }
 ```
 
-### 4. **CommonColumns**
+## AI Generation Guidelines
 
-Define shared columns for all tables in an area:
+When using AI to generate AIR-DML, follow these rules:
+
+**Required:**
+- Use **double quotes** for alias values: `alias: "論理名"` ✅
+- Do NOT use single quotes: `alias: '論理名'` ❌
+- Mark foreign key columns with `[fk]`
+- Define relationships separately with `Ref:`
+- Do NOT add inline comments after column definitions
+
+**Example Output:**
 
 ```dbml
-Area "Content" {
-  posts
-  comments
-
-  CommonColumns: [
-    id serial [pk]
-    created_at timestamp [not null]
-    updated_at timestamp [not null]
-  ]
-}
-```
-
-### 5. **Polyglot Persistence**
-
-Different database types per area:
-
-```dbml
-Area "User Data" [database_type: "PostgreSQL"] {
-  users
+// 定期購入機能
+Table subscriptions [alias: "定期購入"] {
+  id serial [pk, alias: "定期購入ID"]
+  user_id integer [fk, not null, alias: "ユーザーID"]
+  product_id integer [fk, not null, alias: "商品ID"]
+  status text [not null, default: 'active', alias: "ステータス"]
+  created_at timestamp [not null, alias: "作成日時"]
 }
 
-Area "Analytics" [database_type: "BigQuery"] {
-  events
-}
+Ref: subscriptions.user_id > users.id
+Ref: subscriptions.product_id > products.id
 ```
 
-### 6. **AI Relationship Type**
-
-Use `~` for undetermined relationships (AI inference):
-
-```dbml
-Ref: users.id ~ profiles.user_id
-```
+For complete AI generation guidelines, see [SPECIFICATION.md Section 5](./SPECIFICATION.md#5-ai生成時のガイドライン).
 
 ## API Reference
 
@@ -193,28 +208,56 @@ interface Diagram {
 interface Table {
   id: string;
   name: string;
-  logicalName?: string;  // AIR-DML extension
+  logicalName?: string;      // alias
   columns: Column[];
-  color?: string;        // AIR-DML extension
-  pos?: Position;        // AIR-DML extension
-  areaIds?: string[];    // AIR-DML extension
+  color?: string;
+  pos?: Position;
+  areaIds?: string[];
   note?: string;
+  leadingComments?: string[];  // v1.2.0+
+}
+
+interface Column {
+  name: string;
+  logicalName?: string;      // alias
+  type: DataType;
+  typeParams?: string;
+  pk: boolean;
+  fk: boolean;
+  unique: boolean;
+  notNull: boolean;
+  increment: boolean;
+  default?: string;
+  note?: string;
+}
+
+interface Reference {
+  id: string;
+  fromTable: string;
+  fromColumn: string;
+  toTable: string;
+  toColumn: string;
+  type: RelationshipType;
+  swapEdge?: boolean;
+  leadingComments?: string[];  // v1.2.0+
 }
 
 interface Area {
   id: string;
   name: string;
+  tables: string[];
   color?: string;
   pos?: Position;
   width?: number;
   height?: number;
-  databaseType?: string;      // AIR-DML extension
-  commonColumns?: Column[];   // AIR-DML extension
+  labelHorizontal?: 'left' | 'center' | 'right';
+  labelVertical?: 'top' | 'center' | 'bottom';
+  databaseType?: string;
+  commonColumns?: Column[];
   note?: string;
+  leadingComments?: string[];  // v1.2.0+
 }
 ```
-
-See full type definitions in [src/types/index.ts](./src/types/index.ts).
 
 ## Comparison: DBML vs AIR-DML
 
@@ -226,25 +269,34 @@ See full type definitions in [src/types/index.ts](./src/types/index.ts).
 | **Visual info** | ❌ | ✅ Coordinates, colors, sizes |
 | **Multi-DB** | Project-level | Area-level (polyglot persistence) |
 | **AI optimization** | ❌ | ✅ LLM-friendly design |
+| **Comment preservation** | ❌ | ✅ Leading comments (v1.2.0+) |
 
-## Backward Compatibility
+## Changelog
 
-AIR-DML is fully compatible with standard DBML:
-- All standard DBML syntax works in AIR-DML
-- AIR-DML extensions are ignored by standard DBML parsers
-- Powered by `@dbml/core` for core DBML parsing
+### v1.2.3 (2025-01)
+- Bug fixes for Area parsing with Japanese names
+- Improved comment preservation
+- Added AI generation guidelines to specification
 
-## Use Cases
+### v1.2.0 (2025-01)
+- Added leading comment preservation for Tables, References, and Areas
+- Added `leadingComments` field to type definitions
+- Export comments back to AIR-DML format
 
-- **AI-Driven Development**: Generate database schemas from natural language
-- **Domain-Driven Design**: Model bounded contexts with Areas
-- **ER Diagram Tools**: Build visual database designers
-- **Documentation**: Human-readable schema with multilingual support
-- **Polyglot Persistence**: Manage multiple database types in one schema
+### v1.1.0 (2025-01)
+- Added `labelHorizontal` and `labelVertical` attributes for Areas
+- Added `swapEdge` attribute for References
+- Improved Area attribute parsing
+
+### v1.0.0 (2025-01)
+- Initial release
+- Core AIR-DML parsing and export
+- Support for alias, pos_x, pos_y, color attributes
+- Area with CommonColumns and database_type
 
 ## Specification
 
-For the complete AIR-DML specification, see [AIR-DML Specification](https://github.com/hiroaki-handa/air-dml/blob/main/SPECIFICATION.md).
+For the complete AIR-DML specification, see [SPECIFICATION.md](./SPECIFICATION.md).
 
 ## License
 
@@ -255,15 +307,15 @@ AIR-DML extends [DBML](https://github.com/holistics/dbml) (also Apache-2.0).
 ## Credits
 
 - **Created by**: Data-mination Partners
-- **Technical collaboration**: Claude Sonnet 4.5 (Anthropic)
+- **Technical collaboration**: Claude Opus 4.5 (Anthropic)
 - **Based on**: [@dbml/core](https://www.npmjs.com/package/@dbml/core) by Holistics
 
 ## Links
 
 - [GitHub Repository](https://github.com/hiroaki-handa/air-dml)
 - [npm Package](https://www.npmjs.com/package/air-dml)
-- [Issue Tracker](https://github.com/hiroaki-handa/air-dml/issues)
-- [Mode-ai](https://github.com/data-mination/mode-ai) - Reference implementation
+- [AIR-DML Specification](./SPECIFICATION.md)
+- [Mode-ai](https://mode-ai.net) - Reference implementation
 
 ---
 

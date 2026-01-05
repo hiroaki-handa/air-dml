@@ -2,6 +2,8 @@
 
 **AI-Ready Data Modeling Language**
 
+*The Open Standard for AI-Ready Data Modeling*
+
 AIR-DML is an extended DBML (Database Markup Language) parser designed for AI-driven development. It adds powerful features for modern data modeling while maintaining full backward compatibility with standard DBML.
 
 [![npm version](https://badge.fury.io/js/air-dml.svg)](https://www.npmjs.com/package/air-dml)
@@ -320,4 +322,9 @@ AIR-DML extends [DBML](https://github.com/holistics/dbml) (also Apache-2.0).
 
 ---
 
-**AIR-DML™** (AI-Ready Data Modeling Language) is a trademark of Data-mination Partners.
+## Trademarks
+
+**AIR-DML™** (AI-Ready Data Modeling Language) is a trademark of Datamination Partners Co., Ltd.
+Trademark Application No. 2026-000274 (Japan)
+
+*AIR-DML™ — The Open Standard for AI-Ready Data Modeling.*

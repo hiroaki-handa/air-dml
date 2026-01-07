@@ -9,6 +9,22 @@ AIR-DML is an extended DBML (Database Markup Language) parser designed for AI-dr
 [![npm version](https://badge.fury.io/js/air-dml.svg)](https://www.npmjs.com/package/air-dml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+## Used In Production
+
+<a href="https://mode-ai.io">
+  <img src="https://mode-ai.io/favicon.svg" alt="Mode-ai" width="48" height="48" align="left" style="margin-right: 12px;" />
+</a>
+
+**[Mode-ai](https://mode-ai.io)** - AI-Powered Data Modeling Tool
+
+Generate ER diagrams from natural language using AI. Mode-ai is the reference implementation of AIR-DML, showcasing the full potential of AI-ready data modeling.
+
+- Natural language to ER diagram generation
+- Interactive visual editor with drag & drop
+- Export to SQL, DBML, and more
+
+<br clear="left"/>
+
 ## Features
 
 ✨ **AI-Optimized**: Designed for AI language models to understand and generate database schemas
@@ -318,7 +334,7 @@ AIR-DML extends [DBML](https://github.com/holistics/dbml) (also Apache-2.0).
 - [GitHub Repository](https://github.com/hiroaki-handa/air-dml)
 - [npm Package](https://www.npmjs.com/package/air-dml)
 - [AIR-DML Specification](./SPECIFICATION.md)
-- [Mode-ai](https://mode-ai.net) - Reference implementation
+- [Mode-ai](https://mode-ai.io) - Reference implementation (AI-Powered Data Modeling Tool)
 
 ---
 

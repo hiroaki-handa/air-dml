@@ -859,6 +859,7 @@ function parseAttributesString(attrsStr: string): ParsedAttributes {
 
 function mapDbmlTypeToDataType(dbmlType: string): DataType {
   const typeMap: Record<string, DataType> = {
+    // Standard types (normalized)
     int: 'integer',
     integer: 'integer',
     bigint: 'bigint',
@@ -884,7 +885,10 @@ function mapDbmlTypeToDataType(dbmlType: string): DataType {
     bytea: 'bytea',
   };
 
-  return (typeMap[dbmlType.toLowerCase()] as DataType) || 'text';
+  const lowerType = dbmlType.toLowerCase();
+  // Return mapped type if exists, otherwise preserve original type
+  // This allows database-specific types (VARCHAR2, NUMBER, CLOB, etc.) to pass through
+  return (typeMap[lowerType] as DataType) || dbmlType;
 }
 
 function mapDbmlRelationType(relType: string): RelationshipType {

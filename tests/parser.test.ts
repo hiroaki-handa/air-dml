@@ -124,9 +124,11 @@ describe('parseAirDML', () => {
       const diagram = parseAirDML(input);
       const columns = diagram.tables[0].columns;
       expect(columns[0].type).toBe('integer');
-      // Note: Current parser includes params in type
-      expect(columns[1].type).toBe('varchar(100)');
-      expect(columns[2].type).toBe('decimal(10,2)');
+      // New parser separates type and typeParams
+      expect(columns[1].type).toBe('varchar');
+      expect(columns[1].typeParams).toBe('100');
+      expect(columns[2].type).toBe('decimal');
+      expect(columns[2].typeParams).toBe('10,2');
     });
 
     it('should parse pk constraint', () => {
@@ -272,8 +274,8 @@ describe('parseAirDML', () => {
       `;
       const diagram = parseAirDML(input);
       const ref = diagram.references[0];
-      // Note: Current parser normalizes < to many-to-one by swapping endpoints
-      expect(ref.type).toBe('many-to-one');
+      // New parser keeps relationship type as specified: < means one-to-many
+      expect(ref.type).toBe('one-to-many');
     });
 
     it('should parse one-to-one (-)', () => {
@@ -410,7 +412,7 @@ describe('parseAirDML', () => {
     // TODO: These tests are skipped because current @dbml/core parser
     // doesn't support CommonColumns and Note inside Area blocks.
     // New independent parser should support these features.
-    it.skip('should parse area with CommonColumns', () => {
+    it('should parse area with CommonColumns', () => {
       const input = `
         Table users {
           id serial [pk]
@@ -431,7 +433,7 @@ describe('parseAirDML', () => {
       expect(area?.commonColumns?.[0].logicalName).toBe('作成日時');
     });
 
-    it.skip('should parse area with Note', () => {
+    it('should parse area with Note', () => {
       const input = `
         Table users {
           id serial [pk]

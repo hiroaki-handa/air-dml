@@ -1,7 +1,7 @@
 {
   "name": "air-dml",
-  "version": "1.2.9",
-  "description": "AI-Ready Data Modeling Language - Extended DBML parser for AI-driven development",
+  "version": "2.0.0",
+  "description": "AI-Ready Data Modeling Language - Independent AIR-DML parser with zero dependencies",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -50,9 +50,7 @@
   "bugs": {
     "url": "https://github.com/hiroaki-handa/air-dml/issues"
   },
-  "dependencies": {
-    "@dbml/core": "^5.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.0.0",
     "@types/node": "^20.0.0",

@@ -157,6 +157,11 @@ describe('Transformer', () => {
       const profilesTable = result.diagram?.tables.find(t => t.name === 'profiles');
       expect(usersTable?.areaIds).toContain(area?.id);
       expect(profilesTable?.areaIds).toContain(area?.id);
+
+      // Area.tables should contain table IDs
+      expect(area?.tables).toContain(usersTable?.id);
+      expect(area?.tables).toContain(profilesTable?.id);
+      expect(area?.tables).toHaveLength(2);
     });
 
     it('should parse Area with CommonColumns', () => {

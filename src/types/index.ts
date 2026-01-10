@@ -207,6 +207,9 @@ export interface Area {
 
   /** Leading comments (comments immediately before this area) - AIR-DML extension */
   leadingComments?: string[];
+
+  /** Table IDs belonging to this area */
+  tables?: string[];
 }
 
 /**

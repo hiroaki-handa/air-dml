@@ -176,9 +176,18 @@ function transformArea(node: AreaNode, tables: Table[]): Area {
     transformColumn(colNode)
   );
 
+  // Map table names to table IDs
+  const tableIds = node.tables
+    .map((tableName) => {
+      const table = tables.find((t) => t.name === tableName);
+      return table?.id;
+    })
+    .filter((id): id is string => id !== undefined);
+
   return {
     id: areaId,
     name: node.name,
+    tables: tableIds,
     color: node.settings.color,
     pos:
       node.settings.posX !== undefined && node.settings.posY !== undefined

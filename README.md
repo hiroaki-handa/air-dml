@@ -32,7 +32,7 @@ Generate ER diagrams from natural language using AI. Mode-ai is the reference im
 🌍 **Multilingual**: Logical names (aliases) in any language
 🎨 **Visual Design**: Coordinate and color information for diagram rendering
 🔄 **Polyglot Persistence**: Different database types per area
-📦 **Extends DBML**: Fully compatible with standard DBML, powered by `@dbml/core`
+📦 **Extends DBML**: Fully compatible with standard DBML syntax
 💬 **Comment Preservation**: Leading comments are preserved and associated with elements
 
 ## Installation
@@ -120,7 +120,6 @@ Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] 
 | `unique` | Unique constraint | `email varchar [unique]` |
 | `not null` | NOT NULL constraint | `name varchar [not null]` |
 | `increment` | Auto increment | `id integer [pk, increment]` |
-| `default: value` | Default value | `status text [default: 'active']` |
 | `alias: "name"` | Logical name | `[alias: "ユーザーID"]` |
 | `note: "desc"` | Column description | `[note: "説明"]` |
 
@@ -177,7 +176,7 @@ Table subscriptions [alias: "定期購入"] {
   id serial [pk, alias: "定期購入ID"]
   user_id integer [fk, not null, alias: "ユーザーID"]
   product_id integer [fk, not null, alias: "商品ID"]
-  status text [not null, default: 'active', alias: "ステータス"]
+  status text [not null, alias: "ステータス"]
   created_at timestamp [not null, alias: "作成日時"]
 }
 
@@ -241,13 +240,13 @@ interface Column {
   logicalName?: string;      // alias
   type: DataType;
   typeParams?: string;
-  pk: boolean;
-  fk: boolean;
-  unique: boolean;
-  notNull: boolean;
-  increment: boolean;
-  default?: string;
+  pk?: boolean;
+  fk?: boolean;
+  unique?: boolean;
+  notNull?: boolean;
+  increment?: boolean;
   note?: string;
+  leadingComments?: string[];  // v1.2.0+
 }
 
 interface Reference {
@@ -291,6 +290,16 @@ interface Area {
 | **Comment preservation** | ❌ | ✅ Leading comments (v1.2.0+) |
 
 ## Changelog
+
+### v2.1.0 (2025-01)
+- **Breaking**: Removed `default` column constraint from syntax
+- Simplified parser by removing inconsistent quote handling for default values
+
+### v2.0.0 (2025-01)
+- **Major**: Replaced `@dbml/core` dependency with custom hand-written recursive descent parser
+- Full AIR-DML syntax support without external dependencies
+- Improved error messages in Japanese
+- Better handling of Japanese identifiers and comments
 
 ### v1.2.3 (2025-01)
 - Bug fixes for Area parsing with Japanese names

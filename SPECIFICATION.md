@@ -1,8 +1,8 @@
 # AIR-DML仕様書
 ## AI-Ready Data Modeling Language Specification
 
-**バージョン**: 1.0
-**最終更新**: 2025-01-02
+**バージョン**: 2.1
+**最終更新**: 2025-01-11
 **対象**: AI、開発者、データアーキテクト
 **提供**: データミネーションパートナーズ
 
@@ -106,10 +106,9 @@ column_name data_type [constraint1, constraint2, ...]
 | `fk` | Foreign Key（外部キー、自動検出） | `user_id integer [fk]` |
 | `unique` | 一意制約 | `email varchar(255) [unique]` |
 | `not null` | NULL不可 | `username varchar(100) [not null]` |
+| `increment` | 自動採番 | `id integer [pk, increment]` |
 | `alias: "論理名"` | **Mode-ai拡張**: カラムの論理名 | `[alias: "ユーザーID"]` |
 | `note: "説明"` | カラムの説明 | `[note: "メールアドレス（重複不可）"]` |
-
-**注**: `increment`と`default: value`はDBMLパーサーでは解釈されますが、Mode-aiのフロントエンドUIでは未実装です。
 
 #### データ型
 
@@ -167,7 +166,7 @@ Table posts {
   user_id integer [fk, not null, alias: "ユーザーID"]
   title varchar(255) [not null, alias: "タイトル"]
   content text [not null, alias: "本文"]
-  published boolean [not null, default: false, alias: "公開フラグ"]
+  published boolean [not null, alias: "公開フラグ"]
   created_at timestamp [not null, alias: "作成日時"]
   updated_at timestamp [not null, alias: "更新日時"]
 }
@@ -319,7 +318,7 @@ Table posts [alias: "投稿", pos_x: 100, pos_y: 450, color: "#9333EA"] {
   user_id integer [fk, not null, alias: "ユーザーID"]
   title varchar(255) [not null, alias: "タイトル"]
   content text [not null, alias: "内容"]
-  published boolean [not null, default: false, alias: "公開フラグ"]
+  published boolean [not null, alias: "公開フラグ"]
   created_at timestamp [not null, alias: "作成日時"]
   updated_at timestamp [not null, alias: "更新日時"]
 }
@@ -431,7 +430,6 @@ Table テーブル名 [alias: "日本語名"] {
 [unique]                // 一意制約
 [not null]              // NOT NULL
 [increment]             // 自動採番（serialと併用不要）
-[default: 値]           // デフォルト値
 [alias: "日本語名"]     // 論理名
 [note: "説明"]          // カラム説明
 
@@ -474,7 +472,7 @@ Table subscriptions [alias: "定期購入"] {
   user_id integer [fk, not null, alias: "ユーザーID"]
   product_id integer [fk, not null, alias: "商品ID"]
   delivery_frequency text [not null, alias: "配送頻度"]
-  status text [not null, default: 'active', alias: "ステータス"]
+  status text [not null, alias: "ステータス", note: "active/paused/cancelled"]
   next_delivery_date date [not null, alias: "次回配送予定日"]
   start_date date [not null, alias: "開始日"]
   end_date date [alias: "終了日"]
@@ -487,7 +485,7 @@ Table subscription_deliveries [alias: "定期購入配送履歴"] {
   subscription_id integer [fk, not null, alias: "定期購入ID"]
   scheduled_date date [not null, alias: "配送予定日"]
   actual_date date [alias: "実際の配送日"]
-  status text [not null, default: 'pending', alias: "配送ステータス"]
+  status text [not null, alias: "配送ステータス", note: "pending/shipped/delivered"]
   created_at timestamp [not null, alias: "作成日時"]
   updated_at timestamp [not null, alias: "更新日時"]
 }
@@ -548,6 +546,8 @@ Ref: subscription_deliveries.subscription_id > subscriptions.id
 
 | バージョン | 日付 | 変更内容 |
 |------------|------|----------|
+| 2.1 | 2025-01-11 | `default`カラム制約を構文から削除 |
+| 2.0 | 2025-01-10 | 独自パーサー実装（@dbml/core依存を削除） |
 | 1.0 | 2025-01-02 | AIR-DML規格として正式リリース（AI-Ready Data Modeling Language） |
 
 ---
@@ -583,6 +583,6 @@ Ref: subscription_deliveries.subscription_id > subscriptions.id
 ---
 
 **策定**: データミネーションパートナーズ
-**技術協力**: Claude Sonnet 4.5 (Anthropic)
+**技術協力**: Claude Opus 4.5 (Anthropic)
 **公開日**: 2025-01-02
 **ライセンス**: MIT License (本仕様書)

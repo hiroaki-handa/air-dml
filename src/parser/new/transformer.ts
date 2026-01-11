@@ -137,7 +137,8 @@ function transformColumn(node: ColumnNode): Column {
 function transformRef(node: RefNode): Reference {
   const fromTableId = `table-${node.from.table}`;
   const toTableId = `table-${node.to.table}`;
-  const refId = `ref-${node.from.table}-${node.from.column}`;
+  // 一意のRef IDを生成（from + to を含める）
+  const refId = `ref-${node.from.table}-${node.from.column}-${node.to.table}-${node.to.column}`;
 
   return {
     id: refId,

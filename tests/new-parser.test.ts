@@ -176,42 +176,6 @@ describe('New Parser', () => {
       expect(ast.tables[0].columns[0].constraints.increment).toBe(true);
     });
 
-    it('should parse default with string value', () => {
-      const { ast, errors } = parse(`
-        Table users {
-          status varchar [default: 'active']
-        }
-      `);
-
-      expect(errors).toHaveLength(0);
-      expect(ast.tables[0].columns[0].constraints.default).toBe("'active'");
-      expect(ast.tables[0].columns[0].constraints.defaultType).toBe('string');
-    });
-
-    it('should parse default with function value', () => {
-      const { ast, errors } = parse(`
-        Table users {
-          created_at timestamp [default: \`now()\`]
-        }
-      `);
-
-      expect(errors).toHaveLength(0);
-      expect(ast.tables[0].columns[0].constraints.default).toBe('`now()`');
-      expect(ast.tables[0].columns[0].constraints.defaultType).toBe('function');
-    });
-
-    it('should parse default with number value', () => {
-      const { ast, errors } = parse(`
-        Table products {
-          quantity int [default: 0]
-        }
-      `);
-
-      expect(errors).toHaveLength(0);
-      expect(ast.tables[0].columns[0].constraints.default).toBe('0');
-      expect(ast.tables[0].columns[0].constraints.defaultType).toBe('value');
-    });
-
     it('should parse alias constraint', () => {
       const { ast, errors } = parse(`
         Table users {
@@ -572,7 +536,7 @@ describe('New Parser', () => {
         Table users [alias: "ユーザー", color: "#1976D2"] {
           id serial [pk, not null, alias: "ID"]
           email varchar(255) [unique, not null]
-          created_at timestamp [default: \`now()\`]
+          created_at timestamp
 
           indexes {
             email [unique]
@@ -582,7 +546,7 @@ describe('New Parser', () => {
         Table orders [alias: "注文"] {
           id serial [pk]
           user_id int [fk, not null]
-          total decimal(10,2) [default: 0]
+          total decimal(10,2)
         }
 
         Ref: orders.user_id > users.id

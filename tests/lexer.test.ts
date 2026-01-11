@@ -21,7 +21,7 @@ describe('Lexer', () => {
     });
 
     it('should tokenize constraint keywords', () => {
-      const lexer = new Lexer('pk fk unique not null increment default');
+      const lexer = new Lexer('pk fk unique not null increment');
       const tokens = lexer.tokenize();
 
       expect(tokens[0].type).toBe(TokenType.PK);
@@ -30,7 +30,6 @@ describe('Lexer', () => {
       expect(tokens[3].type).toBe(TokenType.NOT);
       expect(tokens[4].type).toBe(TokenType.NULL);
       expect(tokens[5].type).toBe(TokenType.INCREMENT);
-      expect(tokens[6].type).toBe(TokenType.DEFAULT);
     });
 
     it('should tokenize attribute keywords', () => {

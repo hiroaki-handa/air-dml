@@ -151,7 +151,6 @@ export function exportToAirDML(diagram: Diagram): string {
       if (column.unique) constraints.push('unique');
       if (column.notNull) constraints.push('not null');
       if (column.increment) constraints.push('increment');
-      if (column.default) constraints.push(`default: ${formatDefaultValue(column.default)}`);
 
       if (column.logicalName) {
         constraints.push(`alias: "${escapeString(column.logicalName)}"`);
@@ -260,7 +259,6 @@ export function exportToAirDML(diagram: Diagram): string {
             if (column.unique) constraints.push('unique');
             if (column.notNull) constraints.push('not null');
             if (column.increment) constraints.push('increment');
-            if (column.default) constraints.push(`default: ${formatDefaultValue(column.default)}`);
 
             if (column.logicalName) {
               constraints.push(`alias: "${escapeString(column.logicalName)}"`);
@@ -321,17 +319,4 @@ function escapeIdentifier(name: string): string {
 function escapeString(str: string | undefined): string {
   if (!str) return '';
   return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-}
-
-function formatDefaultValue(value: string): string {
-  // If it looks like a function call (contains parentheses), wrap in backticks
-  if (value.includes('(') && value.includes(')')) {
-    return `\`${value}\``;
-  }
-  // If it's a number or boolean, leave as-is
-  if (/^-?\d+(\.\d+)?$/.test(value) || value === 'true' || value === 'false' || value === 'null') {
-    return value;
-  }
-  // Otherwise, it's a string - wrap in single quotes
-  return `'${value}'`;
 }

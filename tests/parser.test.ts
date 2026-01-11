@@ -181,28 +181,6 @@ describe('parseAirDML', () => {
       expect(diagram.tables[0].columns[0].increment).toBe(true);
     });
 
-    it('should parse default value with string', () => {
-      const input = `
-        Table test {
-          status varchar(20) [default: 'active']
-        }
-      `;
-      const diagram = parseAirDML(input);
-      // Note: Current parser strips quotes from default values
-      expect(diagram.tables[0].columns[0].default).toBe('active');
-    });
-
-    it('should parse default value with function', () => {
-      const input = `
-        Table test {
-          created_at timestamp [default: \`now()\`]
-        }
-      `;
-      const diagram = parseAirDML(input);
-      // Note: Current parser strips backticks from default values
-      expect(diagram.tables[0].columns[0].default).toBe('now()');
-    });
-
     it('should parse alias', () => {
       const input = `
         Table test {
@@ -620,7 +598,7 @@ describe('Complex scenarios', () => {
         id serial [pk, not null, alias: "ユーザーID"]
         email varchar(255) [unique, not null, alias: "メールアドレス"]
         name varchar(100) [not null, alias: "氏名"]
-        created_at timestamp [not null, default: \`now()\`, alias: "作成日時"]
+        created_at timestamp [not null, alias: "作成日時"]
 
         Note: "User account information"
       }
@@ -630,8 +608,8 @@ describe('Complex scenarios', () => {
         id serial [pk, not null, alias: "注文ID"]
         user_id integer [fk, not null, alias: "ユーザーID"]
         total decimal(10,2) [not null, alias: "合計金額"]
-        status varchar(20) [not null, default: 'pending', alias: "ステータス", note: "pending/confirmed/shipped/delivered"]
-        ordered_at timestamp [not null, default: \`now()\`, alias: "注文日時"]
+        status varchar(20) [not null, alias: "ステータス", note: "pending/confirmed/shipped/delivered"]
+        ordered_at timestamp [not null, alias: "注文日時"]
       }
 
       Ref: orders.user_id > users.id

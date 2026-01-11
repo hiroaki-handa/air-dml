@@ -76,8 +76,6 @@ export interface ColumnConstraints {
   unique?: boolean;
   notNull?: boolean;
   increment?: boolean;
-  default?: string;
-  defaultType?: 'string' | 'function' | 'value';
   alias?: string;
   note?: string;
 }

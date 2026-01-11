@@ -67,9 +67,6 @@ export interface Column {
   /** Not Null constraint */
   notNull?: boolean;
 
-  /** Default value */
-  default?: string;
-
   /** Auto increment (AUTO_INCREMENT) */
   increment?: boolean;
 

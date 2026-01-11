@@ -400,12 +400,6 @@ export class Parser {
       } else if (this.check(TokenType.INCREMENT)) {
         this.advance();
         constraints.increment = true;
-      } else if (this.check(TokenType.DEFAULT)) {
-        this.advance();
-        this.expect(TokenType.COLON);
-        const { value, type } = this.parseDefaultValue();
-        constraints.default = value;
-        constraints.defaultType = type;
       } else if (this.check(TokenType.ALIAS)) {
         this.advance();
         this.expect(TokenType.COLON);
@@ -424,32 +418,6 @@ export class Parser {
 
     this.expect(TokenType.RBRACKET);
     return constraints;
-  }
-
-  private parseDefaultValue(): { value: string; type: 'string' | 'function' | 'value' } {
-    const token = this.peek();
-
-    if (token.type === TokenType.SINGLE_STRING) {
-      this.advance();
-      return { value: `'${token.value}'`, type: 'string' };
-    } else if (token.type === TokenType.STRING) {
-      this.advance();
-      return { value: `"${token.value}"`, type: 'string' };
-    } else if (token.type === TokenType.BACKTICK_STRING) {
-      this.advance();
-      return { value: `\`${token.value}\``, type: 'function' };
-    } else if (token.type === TokenType.NUMBER) {
-      this.advance();
-      return { value: token.value, type: 'value' };
-    } else if (token.type === TokenType.IDENTIFIER) {
-      // Unquoted value like true, false, null
-      this.advance();
-      return { value: token.value, type: 'value' };
-    }
-
-    // Fallback
-    this.advance();
-    return { value: token.value, type: 'value' };
   }
 
   // ============================================
@@ -892,7 +860,6 @@ export class Parser {
       TokenType.NOT,
       TokenType.NULL,
       TokenType.INCREMENT,
-      TokenType.DEFAULT,
       TokenType.ALIAS,
       TokenType.NAME,
     ].includes(type);

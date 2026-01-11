@@ -58,8 +58,6 @@ describe('Transformer', () => {
         Table users {
           id serial [pk, not null, increment, alias: "ID", note: "Primary key"]
           email varchar(255) [unique, not null]
-          status varchar [default: 'active']
-          created_at timestamp [default: \`now()\`]
         }
       `);
 
@@ -74,9 +72,6 @@ describe('Transformer', () => {
 
       expect(columns?.[1].unique).toBe(true);
       expect(columns?.[1].notNull).toBe(true);
-
-      expect(columns?.[2].default).toBe('active');
-      expect(columns?.[3].default).toBe('now()');
     });
 
     it('should parse references and mark FK columns', () => {
@@ -331,13 +326,13 @@ describe('Transformer', () => {
         Table users [alias: "ユーザー", color: "#1976D2"] {
           id serial [pk, not null, alias: "ID"]
           email varchar(255) [unique, not null]
-          created_at timestamp [default: \`now()\`]
+          created_at timestamp
         }
 
         Table orders [alias: "注文"] {
           id serial [pk]
           user_id int [fk, not null]
-          total decimal(10,2) [default: 0]
+          total decimal(10,2)
         }
 
         Ref: orders.user_id > users.id

@@ -99,22 +99,6 @@ function transformTable(node: TableNode): Table {
  * Transform ColumnNode to Column
  */
 function transformColumn(node: ColumnNode): Column {
-  // Parse default value
-  let defaultValue = node.constraints.default;
-  if (defaultValue) {
-    // Remove surrounding quotes from string defaults
-    if (
-      (defaultValue.startsWith("'") && defaultValue.endsWith("'")) ||
-      (defaultValue.startsWith('"') && defaultValue.endsWith('"'))
-    ) {
-      defaultValue = defaultValue.slice(1, -1);
-    }
-    // Keep backtick strings as-is (function calls)
-    if (defaultValue.startsWith('`') && defaultValue.endsWith('`')) {
-      defaultValue = defaultValue.slice(1, -1);
-    }
-  }
-
   return {
     name: node.name,
     logicalName: node.constraints.alias,
@@ -124,7 +108,6 @@ function transformColumn(node: ColumnNode): Column {
     fk: node.constraints.fk,
     unique: node.constraints.unique,
     notNull: node.constraints.notNull,
-    default: defaultValue,
     increment: node.constraints.increment,
     note: node.constraints.note,
     leadingComments: node.leadingComments,

@@ -16,6 +16,7 @@ export const DATABASE_TYPES = [
   'SQLite',
   'BigQuery',
   'Redshift',
+  'Snowflake',
 ] as const;
 
 export type DatabaseType = typeof DATABASE_TYPES[number] | string;
@@ -203,6 +204,42 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'timestamp',
       'timestamptz',
       'varchar',
+    ];
+  }
+
+  // Snowflake
+  if (dbType.includes('snowflake')) {
+    return [
+      'array',
+      'bigint',
+      'binary',
+      'boolean',
+      'byteint',
+      'char',
+      'date',
+      'decimal',
+      'double',
+      'float',
+      'geography',
+      'geometry',
+      'int',
+      'integer',
+      'number',
+      'numeric',
+      'object',
+      'real',
+      'smallint',
+      'string',
+      'text',
+      'time',
+      'timestamp',
+      'timestamp_ltz',
+      'timestamp_ntz',
+      'timestamp_tz',
+      'tinyint',
+      'varbinary',
+      'varchar',
+      'variant',
     ];
   }
 

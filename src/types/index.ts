@@ -194,7 +194,7 @@ export interface Area {
   labelVertical?: 'top' | 'center' | 'bottom';
 
   /** Database type for this area (supports polyglot persistence) */
-  databaseType?: 'PostgreSQL' | 'MySQL' | 'SQLite' | 'SQL Server' | 'Oracle' | 'BigQuery' | 'Redshift' | string;
+  databaseType?: 'PostgreSQL' | 'MySQL' | 'SQLite' | 'SQL Server' | 'Oracle' | 'BigQuery' | 'Redshift' | 'Snowflake' | string;
 
   /** Common columns for all tables in this area (e.g., created_at, updated_at) */
   commonColumns?: Column[];
@@ -223,7 +223,7 @@ export interface Diagram {
   project?: string;
 
   /** Default database type */
-  database?: 'PostgreSQL' | 'MySQL' | 'SQLite' | 'SQL Server' | 'Oracle' | string;
+  database?: 'PostgreSQL' | 'MySQL' | 'SQLite' | 'SQL Server' | 'Oracle' | 'BigQuery' | 'Redshift' | 'Snowflake' | string;
 
   /** Table list */
   tables: Table[];

@@ -73,14 +73,9 @@ npm アカウントに 2FA が設定されており、直接 publish すると *
 | `ENEEDAUTH / NODE_AUTH_TOKEN is empty` | `NPM_TOKEN` が Environment secrets に登録されている | Repository secrets に登録し直す |
 | `E404 Not found` | OIDC Trusted Publisher の設定ミス | NPM_TOKEN シークレット方式を使う（`--provenance` 不要） |
 
-## Mode-ai との連携
+## publish 後の依存プロジェクト更新
 
-```
-air-dml ──(npm publish)──► npm registry
-    └──────────────────────► Mode-ai/web-v3 (package.json: "air-dml": "^2.1.x")
-```
-
-Mode-ai 側でのバージョン更新:
+npm update で最新版を取り込む:
 ```bash
-cd ~/claude/Mode-ai/web-v3 && npm update air-dml
+npm update air-dml
 ```

@@ -112,7 +112,6 @@ export function exportToAirDML(diagram: Diagram): string {
   };
 
   // Project header
-  airDml += `// ${diagram.name}\n`;
   const projectName = diagram.project || diagram.name || 'Untitled';
   airDml += `Project ${escapeIdentifier(projectName)} {\n`;
   airDml += `  database_type: '${diagram.database || 'PostgreSQL'}'\n`;

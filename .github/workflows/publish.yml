@@ -18,6 +18,16 @@ jobs:
 
       - run: npm install
 
+      - name: Check token
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NODE_AUTH_TOKEN is EMPTY"
+          else
+            echo "NODE_AUTH_TOKEN is SET (length: ${#NODE_AUTH_TOKEN})"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

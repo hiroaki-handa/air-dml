@@ -34,25 +34,39 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
     return [
       'bigint',
       'bigserial',
+      'bit',
+      'bit varying',
       'boolean',
       'bytea',
       'char',
+      'cidr',
       'date',
       'decimal',
       'double precision',
+      'inet',
       'integer',
+      'interval',
       'json',
       'jsonb',
+      'jsonpath',
+      'macaddr',
+      'money',
       'numeric',
+      'point',
       'real',
       'serial',
       'smallint',
+      'smallserial',
       'text',
       'time',
       'timestamp',
+      'timestamp with time zone',
       'timestamptz',
+      'tsquery',
+      'tsvector',
       'uuid',
       'varchar',
+      'xml',
     ];
   }
 
@@ -60,6 +74,8 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
   if (dbType.includes('mysql') || dbType.includes('mariadb')) {
     return [
       'bigint',
+      'binary',
+      'bit',
       'blob',
       'boolean',
       'char',
@@ -70,6 +86,7 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'enum',
       'float',
       'int',
+      'integer',
       'json',
       'longblob',
       'longtext',
@@ -85,7 +102,9 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'tinyblob',
       'tinyint',
       'tinytext',
+      'varbinary',
       'varchar',
+      'year',
     ];
   }
 
@@ -93,11 +112,14 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
   if (dbType.includes('oracle')) {
     return [
       'bfile',
+      'binary_double',
+      'binary_float',
       'blob',
       'char',
       'clob',
       'date',
       'float',
+      'integer',
       'interval day to second',
       'interval year to month',
       'long',
@@ -108,8 +130,9 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'nvarchar2',
       'raw',
       'timestamp',
-      'timestamp with time zone',
       'timestamp with local time zone',
+      'timestamp with time zone',
+      'varchar',
       'varchar2',
     ];
   }
@@ -132,12 +155,14 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'hierarchyid',
       'image',
       'int',
+      'json',
       'money',
       'nchar',
       'ntext',
       'numeric',
       'nvarchar',
       'real',
+      'rowversion',
       'smalldatetime',
       'smallint',
       'smallmoney',
@@ -148,6 +173,7 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'uniqueidentifier',
       'varbinary',
       'varchar',
+      'vector',
       'xml',
     ];
   }
@@ -156,10 +182,17 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
   if (dbType.includes('sqlite')) {
     return [
       'blob',
+      'boolean',
+      'date',
+      'datetime',
+      'decimal',
+      'double',
+      'float',
       'integer',
       'numeric',
       'real',
       'text',
+      'varchar',
     ];
   }
 
@@ -178,6 +211,7 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'interval',
       'json',
       'numeric',
+      'range',
       'string',
       'struct',
       'time',
@@ -194,15 +228,20 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'date',
       'decimal',
       'double precision',
+      'geography',
       'geometry',
+      'hllsketch',
       'integer',
       'numeric',
       'real',
       'smallint',
+      'super',
       'text',
       'time',
+      'timetz',
       'timestamp',
       'timestamptz',
+      'varbyte',
       'varchar',
     ];
   }
@@ -224,6 +263,7 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'geometry',
       'int',
       'integer',
+      'map',
       'number',
       'numeric',
       'object',
@@ -240,6 +280,7 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
       'varbinary',
       'varchar',
       'variant',
+      'vector',
     ];
   }
 
@@ -247,25 +288,39 @@ export function getDataTypesForDatabase(databaseType?: string): DataType[] {
   return [
     'bigint',
     'bigserial',
+    'bit',
+    'bit varying',
     'boolean',
     'bytea',
     'char',
+    'cidr',
     'date',
     'decimal',
     'double precision',
+    'inet',
     'integer',
+    'interval',
     'json',
     'jsonb',
+    'jsonpath',
+    'macaddr',
+    'money',
     'numeric',
+    'point',
     'real',
     'serial',
     'smallint',
+    'smallserial',
     'text',
     'time',
     'timestamp',
+    'timestamp with time zone',
     'timestamptz',
+    'tsquery',
+    'tsvector',
     'uuid',
     'varchar',
+    'xml',
   ];
 }
 

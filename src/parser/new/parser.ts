@@ -863,6 +863,7 @@ export class Parser {
       TokenType.REF,
       TokenType.NOTE,
       TokenType.INDEXES,
+      TokenType.COMMON_COLUMNS,
       TokenType.PK,
       TokenType.FK,
       TokenType.UNIQUE,
@@ -870,6 +871,15 @@ export class Parser {
       TokenType.NULL,
       TokenType.INCREMENT,
       TokenType.ALIAS,
+      TokenType.POS_X,
+      TokenType.POS_Y,
+      TokenType.WIDTH,
+      TokenType.HEIGHT,
+      TokenType.COLOR,
+      TokenType.SWAP_EDGE,
+      TokenType.DATABASE_TYPE,
+      TokenType.LABEL_HORIZONTAL,
+      TokenType.LABEL_VERTICAL,
       TokenType.NAME,
     ].includes(type);
   }

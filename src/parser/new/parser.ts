@@ -266,13 +266,23 @@ export class Parser {
       if (this.check(TokenType.RBRACE)) break;
 
       // Check for top-level keywords that indicate we've hit a new definition
-      // This means the table body was not properly closed
+      // BUT: keywords like 'project', 'table', 'ref', 'area' can also be column names
+      // Only treat as unclosed table if followed by { (a block opening)
       if (this.isTopLevelKeyword()) {
-        this.error(
-          'テーブル定義が閉じられていません。"}" が必要です',
-          'UNCLOSED_TABLE'
+        const next = this.peekNext();
+        const looksLikeColumnDef = next && next.type !== TokenType.LBRACE && (
+          next.type === TokenType.IDENTIFIER ||
+          next.type === TokenType.STRING ||
+          this.isKeyword(next.type)
         );
-        break;
+        if (!looksLikeColumnDef) {
+          this.error(
+            'テーブル定義が閉じられていません。"}" が必要です',
+            'UNCLOSED_TABLE'
+          );
+          break;
+        }
+        // Fall through: keyword used as column name (e.g., `project text [not null]`)
       }
 
       if (this.check(TokenType.INDEXES)) {
@@ -317,9 +327,8 @@ export class Parser {
     if (token.type === TokenType.IDENTIFIER || token.type === TokenType.STRING) {
       return true;
     }
-    // Some keywords can be column names (like "name", "note" as column name, etc.)
-    // But not top-level keywords
-    if (this.isKeyword(token.type) && !this.isTopLevelKeyword()) {
+    // Any keyword can be a column name (e.g., 'project', 'table', 'note', 'pk', etc.)
+    if (this.isKeyword(token.type)) {
       return true;
     }
     return false;

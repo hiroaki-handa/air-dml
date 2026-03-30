@@ -159,9 +159,10 @@ export function exportToAirDML(diagram: Diagram): string {
         constraints.push(`note: "${escapeString(column.note)}"`);
       }
 
+      const escapedType = column.type.includes(' ') ? `"${column.type}"` : column.type;
       const typeStr = column.typeParams
-        ? `${column.type}(${column.typeParams})`
-        : column.type;
+        ? `${escapedType}(${column.typeParams})`
+        : escapedType;
 
       const constraintStr =
         constraints.length > 0 ? ` [${constraints.join(', ')}]` : '';
@@ -263,9 +264,10 @@ export function exportToAirDML(diagram: Diagram): string {
               constraints.push(`alias: "${escapeString(column.logicalName)}"`);
             }
 
+            const escapedType = column.type.includes(' ') ? `"${column.type}"` : column.type;
             const typeStr = column.typeParams
-              ? `${column.type}(${column.typeParams})`
-              : column.type;
+              ? `${escapedType}(${column.typeParams})`
+              : escapedType;
 
             const constraintStr =
               constraints.length > 0 ? ` [${constraints.join(', ')}]` : '';

@@ -109,6 +109,7 @@ function transformColumn(node: ColumnNode): Column {
     unique: node.constraints.unique,
     notNull: node.constraints.notNull,
     increment: node.constraints.increment,
+    hidden: node.constraints.hidden,
     note: node.constraints.note,
     leadingComments: node.leadingComments,
   };

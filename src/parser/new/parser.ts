@@ -409,6 +409,9 @@ export class Parser {
       } else if (this.check(TokenType.INCREMENT)) {
         this.advance();
         constraints.increment = true;
+      } else if (this.check(TokenType.HIDDEN)) {
+        this.advance();
+        constraints.hidden = true;
       } else if (this.check(TokenType.ALIAS)) {
         this.advance();
         this.expect(TokenType.COLON);

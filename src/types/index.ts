@@ -73,6 +73,9 @@ export interface Column {
   /** Note or description */
   note?: string;
 
+  /** Hidden from canvas display - AIR-DML extension */
+  hidden?: boolean;
+
   /** Leading comments (comments immediately before this element) - AIR-DML extension */
   leadingComments?: string[];
 }

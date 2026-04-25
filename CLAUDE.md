@@ -19,6 +19,21 @@ air-dml/
 └── .github/workflows/publish.yml  # GitHub Actions による npm 自動公開
 ```
 
+## ⛔ npm publish が失敗したときの禁止事項
+
+**publish が GitHub Actions で失敗した場合、ローカルで回避しようとしてはならない。**
+
+禁止：
+- `node_modules/air-dml/dist/` に直接ビルド成果物をコピーする
+- `npm link` でローカルパッケージをリンクして Mode-ai に反映する
+- `npm install /path/to/air-dml` でローカルパスを直接インストールする
+
+正しい対応：
+1. GitHub Actions のログで失敗原因を確認する
+2. `E404` → NPM_TOKEN の期限切れ → ユーザーに NPM_TOKEN の再生成を依頼する
+3. `ENEEDAUTH` → Environment secrets ではなく Repository secrets に登録されているか確認する
+4. トークン更新後は `gh run rerun <run-id>` で再実行する
+
 ## npm publish 手順（必読）
 
 ### ⚠️ 直接 `npm publish` は使わない
@@ -71,7 +86,7 @@ npm アカウントに 2FA が設定されており、直接 publish すると *
 |---|---|---|
 | `EOTP` | 直接 `npm publish` した | GitHub Actions 経由で publish する |
 | `ENEEDAUTH / NODE_AUTH_TOKEN is empty` | `NPM_TOKEN` が Environment secrets に登録されている | Repository secrets に登録し直す |
-| `E404 Not found` | OIDC Trusted Publisher の設定ミス | NPM_TOKEN シークレット方式を使う（`--provenance` 不要） |
+| `E404 Not found` | NPM_TOKEN の期限切れ or OIDC 設定ミス | npmjs.com で新しい **Automation Token** を生成し、GitHub Repository Secret `NPM_TOKEN` を更新してから再実行 |
 
 ## publish 後の依存プロジェクト更新
 

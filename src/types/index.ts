@@ -76,6 +76,12 @@ export interface Column {
   /** Hidden from canvas display - AIR-DML extension */
   hidden?: boolean;
 
+  /** Categorical/enum values (e.g., "1=承認済/2=ブロック") - AIR-DML extension */
+  values?: string;
+
+  /** Default value - AIR-DML extension */
+  defaultValue?: string;
+
   /** Leading comments (comments immediately before this element) - AIR-DML extension */
   leadingComments?: string[];
 }

@@ -339,6 +339,7 @@ export class Lexer {
       (code >= 65 && code <= 90) ||   // A-Z
       (code >= 97 && code <= 122) ||  // a-z
       code === 95 ||                   // _
+      code === 47 ||                   // / (SAP namespace prefix: /NAMESPACE/FIELD)
       (code >= 0x3040 && code <= 0x309F) || // Hiragana
       (code >= 0x30A0 && code <= 0x30FF) || // Katakana
       (code >= 0x4E00 && code <= 0x9FFF) || // CJK Unified Ideographs

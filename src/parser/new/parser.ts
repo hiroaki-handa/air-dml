@@ -420,6 +420,14 @@ export class Parser {
         this.advance();
         this.expect(TokenType.COLON);
         constraints.note = this.parseStringValue();
+      } else if (this.check(TokenType.VALUES)) {
+        this.advance();
+        this.expect(TokenType.COLON);
+        constraints.values = this.parseStringValue();
+      } else if (this.check(TokenType.DEFAULT)) {
+        this.advance();
+        this.expect(TokenType.COLON);
+        constraints.defaultValue = this.parseStringValue();
       } else if (this.check(TokenType.COMMA)) {
         this.advance();
       } else {

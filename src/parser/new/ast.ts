@@ -79,6 +79,8 @@ export interface ColumnConstraints {
   hidden?: boolean;
   alias?: string;
   note?: string;
+  values?: string;
+  defaultValue?: string;
 }
 
 // ============================================

@@ -25,6 +25,8 @@ export enum TokenType {
   NULL = 'NULL',
   INCREMENT = 'INCREMENT',
   HIDDEN = 'HIDDEN',
+  VALUES = 'VALUES',
+  DEFAULT = 'DEFAULT',
 
   // Attribute keywords
   ALIAS = 'ALIAS',
@@ -119,6 +121,8 @@ export const KEYWORDS: Record<string, TokenType> = {
   'null': TokenType.NULL,
   'increment': TokenType.INCREMENT,
   'hidden': TokenType.HIDDEN,
+  'values': TokenType.VALUES,
+  'default': TokenType.DEFAULT,
 
   // Attributes
   'alias': TokenType.ALIAS,

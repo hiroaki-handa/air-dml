@@ -160,6 +160,14 @@ export function exportToAirDML(diagram: Diagram): string {
         constraints.push(`note: "${escapeString(column.note)}"`);
       }
 
+      if (column.values) {
+        constraints.push(`values: "${escapeString(column.values)}"`);
+      }
+
+      if (column.defaultValue !== undefined && column.defaultValue !== '') {
+        constraints.push(`default: "${escapeString(column.defaultValue)}"`);
+      }
+
       const escapedType = column.type.includes(' ') ? `"${column.type}"` : column.type;
       const typeStr = column.typeParams
         ? `${escapedType}(${column.typeParams})`

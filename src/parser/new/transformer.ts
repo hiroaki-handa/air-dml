@@ -111,6 +111,8 @@ function transformColumn(node: ColumnNode): Column {
     increment: node.constraints.increment,
     hidden: node.constraints.hidden,
     note: node.constraints.note,
+    values: node.constraints.values,
+    defaultValue: node.constraints.defaultValue,
     leadingComments: node.leadingComments,
   };
 }

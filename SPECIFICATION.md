@@ -216,7 +216,7 @@ Ref: from_table.from_column relationship_type to_table.to_column [attributes]
 
 | 属性 | 型 | 説明 | 例 |
 |------|-----|------|-----|
-| `swap_edge` | boolean | **Mode-ai拡張**: エッジの描画方向を反転 | `[swap_edge: true]` |
+| `swap_edge` | boolean | エッジの描画方向を反転 | `[swap_edge: true]` |
 
 #### 例
 

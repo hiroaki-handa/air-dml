@@ -4,7 +4,7 @@
 
 *The Open Standard for AI-Ready Data Modeling*
 
-AIR-DML is an extended DBML (Database Markup Language) parser designed for AI-driven development. It adds powerful features for modern data modeling while maintaining full backward compatibility with standard DBML.
+AIR-DML is a data modeling language designed for AI-driven development. It provides a structured, human- and machine-readable syntax for database schemas enriched with business context.
 
 [![npm version](https://badge.fury.io/js/air-dml.svg)](https://www.npmjs.com/package/air-dml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -21,7 +21,7 @@ Generate ER diagrams from natural language using AI. Mode-ai is the reference im
 
 - Natural language to ER diagram generation
 - Interactive visual editor with drag & drop
-- Export to SQL, DBML, and more
+- Export to SQL, AIR-DML, and more
 
 <br clear="left"/>
 
@@ -32,7 +32,7 @@ Generate ER diagrams from natural language using AI. Mode-ai is the reference im
 🌍 **Multilingual**: Logical names (aliases) in any language
 🎨 **Visual Design**: Coordinate and color information for diagram rendering
 🔄 **Polyglot Persistence**: Different database types per area
-📦 **Extends DBML**: Fully compatible with standard DBML syntax
+📦 **Zero Dependencies**: Independent parser with no external dependencies
 💬 **Comment Preservation**: Leading comments are preserved and associated with elements
 
 ## Installation
@@ -317,17 +317,17 @@ interface Area {
 }
 ```
 
-## Comparison: DBML vs AIR-DML
+## Key Features At a Glance
 
-| Feature | DBML | AIR-DML |
-|---------|------|---------|
-| **Focus** | Database schema | AI-ready + Business context |
-| **Logical names** | ❌ | ✅ `alias` attribute |
-| **Area management** | TableGroup (basic) | Area (extended: CommonColumns, database_type) |
-| **Visual info** | ❌ | ✅ Coordinates, colors, sizes |
-| **Multi-DB** | Project-level | Area-level (polyglot persistence) |
-| **AI optimization** | ❌ | ✅ LLM-friendly design |
-| **Comment preservation** | ❌ | ✅ Leading comments (v1.2.0+) |
+| Feature | Description |
+|---------|-------------|
+| **Logical names** | `alias` attribute for human-readable names in any language |
+| **Classification values** | `values` attribute for enums and status codes |
+| **Area management** | Bounded context grouping with CommonColumns and per-area database type |
+| **Visual layout** | Coordinates, colors, and sizes for diagram rendering |
+| **Multi-DB** | Area-level database type (polyglot persistence) |
+| **AI-optimized** | LLM-friendly syntax designed for generation and interpretation |
+| **Zero dependencies** | Independent recursive descent parser |
 
 ## Changelog
 
@@ -383,13 +383,10 @@ For the complete AIR-DML specification, see [SPECIFICATION.md](./SPECIFICATION.m
 
 Apache-2.0 License - see [LICENSE](./LICENSE) file for details.
 
-AIR-DML extends [DBML](https://github.com/holistics/dbml) (also Apache-2.0).
-
 ## Credits
 
 - **Created by**: Data-mination Partners
-- **Technical collaboration**: Claude Opus 4.5 (Anthropic)
-- **Based on**: [@dbml/core](https://www.npmjs.com/package/@dbml/core) by Holistics
+- **Technical collaboration**: Claude Sonnet 4.6 (Anthropic)
 
 ## Links
 

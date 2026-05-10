@@ -10,7 +10,7 @@
 
 ## 1. 概要
 
-AIR-DML（AI-Ready Data Modeling Language / エアー・ディーエムエル）は、標準的なDBML（Database Markup Language）を拡張した、**AI時代のデータモデリング言語**です。
+AIR-DML（AI-Ready Data Modeling Language / エアー・ディーエムエル）は、**AI時代のデータモデリング言語**です。ゼロ依存の独自パーサーによりデータベーススキーマを定義し、ビジネスコンテキストとAI解釈可能な構造を統合します。
 
 ### 1.1 AIR-DMLとは
 
@@ -421,12 +421,6 @@ Area "コンテンツ管理" [
 - `note`: 領域の説明
 - `CommonColumns`: 領域内共通カラム定義
 
-### 4.2 標準DBMLとの互換性
-
-- **標準DBML部分**（Project, Table, Column, Ref）は完全互換
-- **拡張属性**は標準DBMLパーサーで無視されるため、後方互換性を維持
-- **Area構文**はDBMLのTableGroup構文を拡張（`CommonColumns`、`database_type`などがAIR-DML独自）
-
 ---
 
 ## 5. AI生成時のガイドライン
@@ -547,25 +541,6 @@ Ref: subscription_deliveries.subscription_id > subscriptions.id
 
 ---
 
-## 6. AIR-DML vs DBML
-
-### 6.1 違い
-
-| 項目 | DBML | AIR-DML |
-|------|------|-------|
-| **フォーカス** | データベーススキーマ | AI対応 + ビジネスコンテキスト |
-| **論理名** | ❌ なし | ✅ alias属性 |
-| **領域管理** | TableGroup（基本） | Area（拡張: CommonColumns, database_type） |
-| **視覚情報** | ❌ なし | ✅ 座標・色・サイズ |
-| **多DB対応** | プロジェクト単位 | 領域（Area）単位 |
-| **AI最適化** | ❌ なし | ✅ LLM解釈・生成を想定した設計 |
-
-### 6.2 互換性
-
-- **下位互換**: AIR-DMLはDBMLの完全上位互換
-- **標準DBMLパーサー**: 拡張属性を無視して処理可能
-- **AIR-DMLパーサー**（`air-dml` npm パッケージ）: AIR-DMLの全機能をサポート
-
 ---
 
 ## 7. バージョン履歴
@@ -583,7 +558,7 @@ Ref: subscription_deliveries.subscription_id > subscriptions.id
 | 2.1.2 | 2026-03-27 | Snowflakeデータベース型サポート追加 |
 | 2.1.1 | 2026-01-28 | exportToAirDML出力の冗長コメント削除 |
 | 2.1 | 2025-01-11 | `default`カラム制約を構文から削除（v2.1.9で再設計・復活） |
-| 2.0 | 2025-01-10 | 独自パーサー実装（@dbml/core依存を削除） |
+| 2.0 | 2025-01-10 | ゼロ依存の独自パーサーを実装 |
 | 1.0 | 2025-01-02 | AIR-DML規格として正式リリース |
 
 ---

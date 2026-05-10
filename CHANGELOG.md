@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.12] - 2026-05-10
+
+### Changed
+- NOTICE: `@dbml/core`（Holistics）の帰属表示を削除（v2.0でゼロ依存化済みのため）
+- README: 「extends DBML」「Based on @dbml/core」の記述を削除、DBML比較表を削除
+- SPECIFICATION.md: DBMLへの言及を削除（origin説明・4.2互換性セクション・6章のvs DBML）
+
+---
+
 ## [2.1.11] - 2026-05-10
 
 ### Changed

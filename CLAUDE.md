@@ -41,34 +41,44 @@ air-dml/
 npm アカウントに 2FA が設定されており、直接 publish すると **EOTP エラー**で詰まる。
 必ず **GitHub Actions 経由** で publish する。
 
+### ⚠️ npm publish は GitHub push と必ずセットで行う
+
+**npmページ（npmjs.com）のREADMEやメタ情報は、npm publish したときのパッケージ内容のみ反映される。**
+GitHubにpushしただけではnpmページは更新されない。
+
+→ **README・CHANGELOG・コードを問わず、変更したら必ずバージョンを上げてpublishする。**
+
+ドキュメントのみの変更はパッチバージョン（例: 2.1.9 → 2.1.10）を切る。
+
 ### 正しい手順
 
-1. ソースを修正
-2. `package.json` の `version` をインクリメント（例: `2.1.1` → `2.1.2`）
-3. ビルドして型チェック
+1. ソース・ドキュメントを修正
+2. `package.json` の `version` をインクリメント（例: `2.1.9` → `2.1.10`）
+3. `CHANGELOG.md` に変更内容を追記
+4. ビルドして型チェック（コード変更がある場合）
 
    ```bash
    npm run build
    ```
 
-4. git commit & push
+5. git commit & push
 
    ```bash
    git add -A
-   git commit -m "feat: ..."
+   git commit -m "feat: ..."  # または "docs: ..."
    git push origin main
    ```
 
-5. **バージョンタグを打つ** → GitHub Actions が自動で npm publish する
+6. **バージョンタグを打つ** → GitHub Actions が自動で npm publish する
 
    ```bash
-   git tag v2.1.2
-   git push origin v2.1.2
+   git tag v2.1.10
+   git push origin v2.1.10
    ```
 
-6. Actions の成功を確認: https://github.com/hiroaki-handa/air-dml/actions
+7. Actions の成功を確認: https://github.com/hiroaki-handa/air-dml/actions
 
-7. Mode-ai/web-v3 で依存を更新
+8. Mode-ai/web-v3 で依存を更新
 
    ```bash
    cd ~/claude/Mode-ai/web-v3 && npm update air-dml

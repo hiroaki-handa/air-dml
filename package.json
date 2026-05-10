@@ -1,6 +1,6 @@
 {
   "name": "air-dml",
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "AI-Ready Data Modeling Language - Independent AIR-DML parser with zero dependencies",
   "type": "module",
   "main": "dist/index.js",

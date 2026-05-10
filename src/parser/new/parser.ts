@@ -412,6 +412,9 @@ export class Parser {
       } else if (this.check(TokenType.HIDDEN)) {
         this.advance();
         constraints.hidden = true;
+      } else if (this.check(TokenType.OBSOLETE)) {
+        this.advance();
+        constraints.obsolete = true;
       } else if (this.check(TokenType.ALIAS)) {
         this.advance();
         this.expect(TokenType.COLON);

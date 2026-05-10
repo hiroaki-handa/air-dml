@@ -77,6 +77,7 @@ export interface ColumnConstraints {
   notNull?: boolean;
   increment?: boolean;
   hidden?: boolean;
+  obsolete?: boolean;
   alias?: string;
   note?: string;
   values?: string;

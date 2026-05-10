@@ -110,6 +110,7 @@ function transformColumn(node: ColumnNode): Column {
     notNull: node.constraints.notNull,
     increment: node.constraints.increment,
     hidden: node.constraints.hidden,
+    obsolete: node.constraints.obsolete,
     note: node.constraints.note,
     values: node.constraints.values,
     defaultValue: node.constraints.defaultValue,

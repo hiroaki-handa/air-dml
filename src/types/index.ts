@@ -76,6 +76,9 @@ export interface Column {
   /** Hidden from canvas display - AIR-DML extension */
   hidden?: boolean;
 
+  /** Marks column as deprecated/unused in production - Canvas non-display @since 2.1.15 */
+  obsolete?: boolean;
+
   /** Categorical/enum values (e.g., "1=承認済/2=ブロック") - AIR-DML extension */
   values?: string;
 

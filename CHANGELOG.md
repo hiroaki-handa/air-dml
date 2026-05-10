@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.15] - 2026-05-10
+
+### Added
+- **`obsolete` カラム属性**: 設計上存在するが廃止・実運用未使用のカラムを示すフラグ
+  ```airdml
+  old_column varchar(50) [obsolete, alias: "旧カラム名"]
+  ```
+  - `hidden` との違い: `hidden` は技術的管理カラム（MANDTなど）の非表示、`obsolete` は論理的廃止
+  - `exportToAirDML` で `[obsolete]` として出力
+  - `Column` インターフェースに `obsolete?: boolean` を追加
+
+---
+
 ## [2.1.14] - 2026-05-10
 
 ### Changed

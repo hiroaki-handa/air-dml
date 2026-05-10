@@ -151,6 +151,7 @@ export function exportToAirDML(diagram: Diagram): string {
       if (column.notNull) constraints.push('not null');
       if (column.increment) constraints.push('increment');
       if (column.hidden) constraints.push('hidden');
+      if (column.obsolete) constraints.push('obsolete');
 
       if (column.logicalName) {
         constraints.push(`alias: "${escapeString(column.logicalName)}"`);

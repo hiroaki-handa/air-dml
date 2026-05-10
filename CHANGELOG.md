@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.13] - 2026-05-10
+
+### Changed
+- コードフェンスの言語識別子を ` ```dbml ` → ` ```airdml ` に統一（README・SPECIFICATION.md 計18箇所）
+
+---
+
 ## [2.1.12] - 2026-05-10
 
 ### Changed

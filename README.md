@@ -103,7 +103,7 @@ console.log(output);
 
 ### Table Definition
 
-```dbml
+```airdml
 Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] {
   column_name data_type [constraints, alias: "カラム論理名"]
 
@@ -130,7 +130,7 @@ Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] 
 
 Define allowed values for a column (status codes, flags, etc.):
 
-```dbml
+```airdml
 status varchar(1) [
   not null,
   alias: "ステータス",
@@ -143,7 +143,7 @@ Format: `"key=label/key2=label2/..."` — key and label separated by `=`, entrie
 
 ### Relationships
 
-```dbml
+```airdml
 Ref: table_a.column > table_b.column   // Many-to-One (A → B)
 Ref: table_a.column < table_b.column   // One-to-Many (A ← B)
 Ref: table_a.column - table_b.column   // One-to-One
@@ -153,7 +153,7 @@ Ref: table_a.column ~ table_b.column   // AI-inferred (undetermined)
 
 ### Area (Bounded Context)
 
-```dbml
+```airdml
 Area "Area Name" [
   pos_x: 50,
   pos_y: 50,
@@ -188,7 +188,7 @@ When using AI to generate AIR-DML, follow these rules:
 
 **Example Output:**
 
-```dbml
+```airdml
 // 定期購入機能
 Table subscriptions [alias: "定期購入"] {
   id serial [pk, alias: "定期購入ID"]

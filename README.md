@@ -120,8 +120,26 @@ Table table_name [alias: "論理名", pos_x: 100, pos_y: 200, color: "#1976D2"] 
 | `unique` | Unique constraint | `email varchar [unique]` |
 | `not null` | NOT NULL constraint | `name varchar [not null]` |
 | `increment` | Auto increment | `id integer [pk, increment]` |
+| `hidden` | Hide column in canvas | `MANDT varchar [hidden]` |
 | `alias: "name"` | Logical name | `[alias: "ユーザーID"]` |
 | `note: "desc"` | Column description | `[note: "説明"]` |
+| `values: "k=v/..."` | Enum / classification values | `[values: "1=有効/2=無効"]` |
+| `default: "val"` | Default value | `[default: "active"]` |
+
+#### `values:` — Enum / Classification Values
+
+Define allowed values for a column (status codes, flags, etc.):
+
+```dbml
+status varchar(1) [
+  not null,
+  alias: "ステータス",
+  values: "1=有効/2=無効/3=削除済",
+  default: "1"
+]
+```
+
+Format: `"key=label/key2=label2/..."` — key and label separated by `=`, entries separated by `/`.
 
 ### Relationships
 
@@ -176,13 +194,16 @@ Table subscriptions [alias: "定期購入"] {
   id serial [pk, alias: "定期購入ID"]
   user_id integer [fk, not null, alias: "ユーザーID"]
   product_id integer [fk, not null, alias: "商品ID"]
-  status text [not null, alias: "ステータス"]
+  status varchar(1) [not null, alias: "ステータス", values: "1=有効/2=停止/3=解約", default: "1"]
   created_at timestamp [not null, alias: "作成日時"]
 }
 
 Ref: subscriptions.user_id > users.id
 Ref: subscriptions.product_id > products.id
 ```
+
+**Use `values:` for any column with a fixed set of allowed values** (status, type, flag, etc.).
+Format: `"key=label/key2=label2/..."` with `/` separator.
 
 For complete AI generation guidelines, see [SPECIFICATION.md Section 5](./SPECIFICATION.md#5-ai生成時のガイドライン).
 
@@ -245,7 +266,10 @@ interface Column {
   unique?: boolean;
   notNull?: boolean;
   increment?: boolean;
+  hidden?: boolean;          // v2.1.8+
   note?: string;
+  values?: string;           // v2.1.9+ — "key=label/key2=label2/..."
+  defaultValue?: string;     // v2.1.9+
   leadingComments?: string[];  // v1.2.0+
 }
 
@@ -291,30 +315,43 @@ interface Area {
 
 ## Changelog
 
+### v2.1.9 (2026-04)
+- Added `values: "key=label/..."` column attribute for enum/classification values
+- Added `default: "value"` column attribute (redesigned with double-quote consistency)
+- SAP R/3 namespace support: `/NAMESPACE/FIELDNAME` identifiers in lexer
+
+### v2.1.8 (2026-04)
+- Added `hidden` column attribute to hide columns from canvas display
+
+### v2.1.7 (2026-04)
+- Fixed: attribute keywords (`alias`, `note`, etc.) now usable as column names
+
+### v2.1.6 (2026-03)
+- Fixed: top-level keywords (`project`, `table`, `ref`, `area`) now usable as column names
+
+### v2.1.5 (2026-03)
+- Fixed: multi-word type names (e.g. `timestamp with time zone`) correctly quoted in export
+
+### v2.1.4 (2026-03)
+- Added SQL standard type names to PostgreSQL (character varying, time with time zone, etc.)
+
+### v2.1.3 (2026-03)
+- Expanded data type lists for all 8 databases (PostgreSQL, MySQL, Oracle, SQL Server, SQLite, BigQuery, Redshift, Snowflake)
+
+### v2.1.2 (2026-03)
+- Added Snowflake database type support
+
 ### v2.1.0 (2025-01)
-- **Breaking**: Removed `default` column constraint from syntax
-- Simplified parser by removing inconsistent quote handling for default values
+- **Breaking**: Removed `default` column constraint (re-added in v2.1.9 with double-quote consistency)
 
 ### v2.0.0 (2025-01)
 - **Major**: Replaced `@dbml/core` dependency with custom hand-written recursive descent parser
 - Full AIR-DML syntax support without external dependencies
 - Improved error messages in Japanese
-- Better handling of Japanese identifiers and comments
-
-### v1.2.3 (2025-01)
-- Bug fixes for Area parsing with Japanese names
-- Improved comment preservation
-- Added AI generation guidelines to specification
 
 ### v1.2.0 (2025-01)
 - Added leading comment preservation for Tables, References, and Areas
 - Added `leadingComments` field to type definitions
-- Export comments back to AIR-DML format
-
-### v1.1.0 (2025-01)
-- Added `labelHorizontal` and `labelVertical` attributes for Areas
-- Added `swapEdge` attribute for References
-- Improved Area attribute parsing
 
 ### v1.0.0 (2025-01)
 - Initial release

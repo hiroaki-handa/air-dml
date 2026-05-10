@@ -49,7 +49,7 @@ import { parseAirDML, exportToAirDML } from 'air-dml';
 // Parse AIR-DML text
 const airDmlText = `
 Project "My Project" {
-  database_type: 'PostgreSQL'
+  database_type: "PostgreSQL"
 }
 
 // ユーザー管理
@@ -227,6 +227,22 @@ Export a Diagram object to AIR-DML text.
 - `diagram` - Diagram object
 
 **Returns:** AIR-DML formatted text
+
+### `getDataTypesForDatabase(database: string): string[]`
+
+Get the list of supported data types for a specific database.
+
+**Parameters:**
+- `database` - Database name: `"PostgreSQL"` | `"MySQL"` | `"SQLite"` | `"SQL Server"` | `"Oracle"` | `"BigQuery"` | `"Redshift"` | `"Snowflake"`
+
+**Returns:** Array of data type strings
+
+```typescript
+import { getDataTypesForDatabase } from 'air-dml';
+
+const types = getDataTypesForDatabase('PostgreSQL');
+// ["integer", "bigint", "varchar", "text", "boolean", "timestamp", ...]
+```
 
 ## Type Definitions
 

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.11] - 2026-05-10
+
+### Changed
+- SPECIFICATION.md を v2.1.11 に同期
+  - ヘッダーのバージョン・日付を更新
+  - `values:` / `default:` / `hidden:` をカラム制約表・拡張機能一覧・AIクイックリファレンスに追記
+  - Snowflake を database_type の選択肢に追加
+  - 「Mode-ai独自機能」「Mode-ai拡張」ラベルを削除（AIR-DML標準として記述）
+  - バージョン履歴を v2.1.1〜2.1.10 まで追記
+  - AI生成例のstatusカラムを `note:` ではなく `values:` 使用に更新
+  - サンプルの `database_type: 'PostgreSQL'`（シングルクォート）をダブルクォートに修正
+- README.md
+  - Quick Start の `database_type: 'PostgreSQL'` をダブルクォートに修正
+  - `getDataTypesForDatabase()` を API リファレンスに追加
+
+---
+
 ## [2.1.10] - 2026-05-10
 
 ### Changed
